@@ -99,7 +99,7 @@ public final class BreakOutStrategy implements Strategy {
 			position = simulator.getPosition();
 		}
 		if (position == null || position.getDirection() == Direction.FLAT) {
-			openPosition(position, Side.BUY);
+			openPosition(Side.BUY);
 		}
 	}
 
@@ -123,7 +123,7 @@ public final class BreakOutStrategy implements Strategy {
 			position = simulator.getPosition();
 		}
 		if (position == null || position.getDirection() == Direction.FLAT) {
-			openPosition(position, Side.SELL);
+			openPosition(Side.SELL);
 		}
 	}
 
@@ -142,7 +142,7 @@ public final class BreakOutStrategy implements Strategy {
 		return simulator.getPosition();
 	}
 	
-	private void openPosition(final Position position, final Side side) {
+	private void openPosition(final Side side) {
 		final long cashBalance = Math.round(simulator.getCashBalance() - 0.5);
 		if (cashBalance > 0) {
 			simulator.sendOrder(new MarketOrder(side, cashBalance));
