@@ -3,3 +3,5 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/8fc3d9420b744e59a65bbf854da42511)](https://www.codacy.com/app/brunostuessy/breakout?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brunostuessy/breakout&amp;utm_campaign=Badge_Grade)
 
 # breakout
+
+Initial version
