@@ -1,5 +1,6 @@
 package ch.brunostuessy.algo.breakout;
 
+import java.util.Objects;
 import java.util.stream.DoubleStream;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -27,6 +28,8 @@ public final class StrategyRunner {
 	private final SummaryStatistics infiniteCloseStats = new SummaryStatistics();
 
 	public StrategyRunner(final Strategy strategy, final Simulator simulator, final int windowSize) {
+		Objects.requireNonNull(strategy, "strategy is null!");
+		Objects.requireNonNull(simulator, "simulator is null!");
 		this.strategy = strategy;
 		this.simulator = simulator;
 		this.windowSize = windowSize;

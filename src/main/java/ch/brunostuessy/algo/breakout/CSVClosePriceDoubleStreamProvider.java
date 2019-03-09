@@ -28,7 +28,6 @@ public final class CSVClosePriceDoubleStreamProvider {
 	 */
 	public DoubleStream closePrices(final String candleFilePath) throws IOException {
 		// final DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
-
 		return Files.lines(Paths.get(candleFilePath)).skip(1).mapToDouble(candleData -> {
 			final String[] candleColumns = candleData.split(",", -1);
 
