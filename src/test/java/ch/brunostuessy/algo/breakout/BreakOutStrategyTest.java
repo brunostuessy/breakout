@@ -23,11 +23,11 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 30);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+		Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.UNKNOWN);
 		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
 			runner.runClose(0.9271);
-			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.UNKNOWN);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 			runner.runClose(0.9271);
 			runner.runClose(0.9507);
@@ -57,7 +57,7 @@ public class BreakOutStrategyTest {
 			runner.runClose(0.9285);
 			runner.runClose(0.9182);
 			runner.runClose(0.9253);
-			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.UNKNOWN);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// fill window
@@ -139,7 +139,7 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
+		Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.UNKNOWN);
 		try {
 			runner.runClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
