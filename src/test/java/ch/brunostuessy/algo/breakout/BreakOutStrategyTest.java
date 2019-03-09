@@ -16,7 +16,7 @@ public class BreakOutStrategyTest {
 	 * BDD test with window size 30.
 	 */
 	@Test
-	public void testStrategyWithWindowSize30() {
+	public void strategyWithWindowSize30() {
 		final Simulator simulator = new SimulatorImpl();
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
 
@@ -132,7 +132,7 @@ public class BreakOutStrategyTest {
 	 * BDD test without window.
 	 */
 	@Test
-	public void testStrategyWithoutWindow() {
+	public void strategyWithoutWindow() {
 		final Simulator simulator = new SimulatorImpl();
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
 

@@ -73,6 +73,7 @@ public final class BreakOutStrategy implements Strategy {
 		case ONMIDDLE:
 			onCloseWithinBollingerOnMovingAverage();
 			break;
+		default:
 		}
 	}
 
@@ -127,9 +128,6 @@ public final class BreakOutStrategy implements Strategy {
 		}
 	}
 
-	/**
-	 * NOP.
-	 */
 	private void onCloseWithinBollingerOnMovingAverage() {
 	}
 
