@@ -2,6 +2,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/brunostuessy/breakout/badge.svg?branch=master)](https://coveralls.io/github/brunostuessy/breakout?branch=master)
 [![Build Status](https://travis-ci.com/brunostuessy/breakout.svg?branch=master)](https://travis-ci.com/brunostuessy/breakout)
 
-# breakout
+# BreakOut Strategy.
 
-Initial version
+Initial version.
