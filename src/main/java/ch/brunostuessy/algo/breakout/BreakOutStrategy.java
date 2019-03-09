@@ -24,6 +24,8 @@ public final class BreakOutStrategy implements Strategy {
 
 	private final Simulator simulator;
 
+	private BollingerLocation bollingerLocation = BollingerLocation.ONMIDDLE;
+
 	public BreakOutStrategy(final Simulator simulator) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
@@ -53,21 +55,24 @@ public final class BreakOutStrategy implements Strategy {
 			return;
 		}
 
-		final double movingAverage = closeStats.getMean();
-		final double factor = 2.0;
-		final double stddev = closeStats.getStandardDeviation();
-		final double bollingerUpper = movingAverage + factor * stddev;
-		final double bollingerLower = movingAverage - factor * stddev;
+		updateBollingerLocation(close, closeStats);
 
-		if (close < bollingerLower) {
+		switch (getBollingerLocation()) {
+		case BELOWLOWER:
 			onCloseBelowBollingerLower();
-		} else if (close > bollingerUpper) {
+			break;
+		case ABOVEUPPER:
 			onCloseAboveBollingerUpper();
-		}
-		if (close < movingAverage) {
-			onCloseBelowMovingAverage();
-		} else if (close > movingAverage) {
-			onCloseAboveMovingAverage();
+			break;
+		case BELOWMIDDLE:
+			onCloseWithinBollingerBelowMovingAverage();
+			break;
+		case ABOVEMIDDLE:
+			onCloseWithinBollingerAboveMovingAverage();
+			break;
+		case ONMIDDLE:
+			onCloseWithinBollingerOnMovingAverage();
+			break;
 		}
 	}
 
@@ -76,11 +81,11 @@ public final class BreakOutStrategy implements Strategy {
 	 */
 	@Override
 	public void onEnd() {
-		final Position position = simulator.getPosition();
-		if (position != null && position.getDirection() == Direction.SHORT) {
-			closePosition(position, Side.BUY);
-		} else if (position != null && position.getDirection() == Direction.LONG) {
-			closePosition(position, Side.SELL);
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+		} else if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
 		}
 	}
 
@@ -88,23 +93,13 @@ public final class BreakOutStrategy implements Strategy {
 	 * Opens LONG position if none including closing any SHORT position ahead.
 	 */
 	private void onCloseBelowBollingerLower() {
-		Position position = simulator.getPosition();
-		if (position != null && position.getDirection() == Direction.SHORT) {
-			closePosition(position, Side.BUY);
-			position = simulator.getPosition();
+		Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+			positionDirection = getPositionDirection();
 		}
-		if (position == null || position.getDirection() == Direction.FLAT) {
+		if (positionDirection == Direction.FLAT) {
 			openPosition(Side.BUY);
-		}
-	}
-
-	/**
-	 * Closes LONG position if any.
-	 */
-	private void onCloseAboveMovingAverage() {
-		final Position position = simulator.getPosition();
-		if (position != null && position.getDirection() == Direction.LONG) {
-			closePosition(position, Side.SELL);
 		}
 	}
 
@@ -112,28 +107,69 @@ public final class BreakOutStrategy implements Strategy {
 	 * Opens SHORT position if none including closing any LONG position ahead.
 	 */
 	private void onCloseAboveBollingerUpper() {
-		Position position = simulator.getPosition();
-		if (position != null && position.getDirection() == Direction.LONG) {
-			closePosition(position, Side.SELL);
-			position = simulator.getPosition();
+		Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
+			positionDirection = getPositionDirection();
 		}
-		if (position == null || position.getDirection() == Direction.FLAT) {
+		if (positionDirection == Direction.FLAT) {
 			openPosition(Side.SELL);
 		}
 	}
 
 	/**
-	 * Closes SHORT position if any.
+	 * Closes LONG position if any.
 	 */
-	private void onCloseBelowMovingAverage() {
-		final Position position = simulator.getPosition();
-		if (position != null && position.getDirection() == Direction.SHORT) {
-			closePosition(position, Side.BUY);
+	private void onCloseWithinBollingerAboveMovingAverage() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
 		}
 	}
 
-	protected Position getPosition() {
-		return simulator.getPosition();
+	/**
+	 * NOP.
+	 */
+	private void onCloseWithinBollingerOnMovingAverage() {
+	}
+
+	/**
+	 * Closes SHORT position if any.
+	 */
+	private void onCloseWithinBollingerBelowMovingAverage() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+		}
+	}
+
+	protected BollingerLocation getBollingerLocation() {
+		return bollingerLocation;
+	}
+
+	private void updateBollingerLocation(final double close, final StatisticalSummary closeStats) {
+		final double movingAverage = closeStats.getMean();
+		final double factor = 2.0;
+		final double stddev = closeStats.getStandardDeviation();
+		final double bollingerUpper = movingAverage + factor * stddev;
+		final double bollingerLower = movingAverage - factor * stddev;
+
+		if (close < bollingerLower) {
+			bollingerLocation = BollingerLocation.BELOWLOWER;
+		} else if (close > bollingerUpper) {
+			bollingerLocation = BollingerLocation.ABOVEUPPER;
+		} else if (close < movingAverage) {
+			bollingerLocation = BollingerLocation.BELOWMIDDLE;
+		} else if (close > movingAverage) {
+			bollingerLocation = BollingerLocation.ABOVEMIDDLE;
+		} else {
+			bollingerLocation = BollingerLocation.ONMIDDLE;
+		}
+	}
+
+	protected Direction getPositionDirection() {
+		final Position position = simulator.getPosition();
+		return position != null ? position.getDirection() : Direction.FLAT;
 	}
 
 	private void openPosition(final Side side) {
@@ -143,7 +179,8 @@ public final class BreakOutStrategy implements Strategy {
 		}
 	}
 
-	private void closePosition(final Position position, final Side side) {
+	private void closePosition(final Side side) {
+		final Position position = simulator.getPosition();
 		simulator.sendOrder(new MarketOrder(side, Math.abs(position.getQuantity())));
 		logger.info("closed position: cash balance is " + simulator.getCashBalance());
 	}

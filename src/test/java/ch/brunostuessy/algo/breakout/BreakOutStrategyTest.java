@@ -23,12 +23,12 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 30);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getPosition() == null
-				|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+		Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
 			runner.runClose(0.9271);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 			runner.runClose(0.9271);
 			runner.runClose(0.9507);
 			runner.runClose(0.9575);
@@ -57,74 +57,74 @@ public class BreakOutStrategyTest {
 			runner.runClose(0.9285);
 			runner.runClose(0.9182);
 			runner.runClose(0.9253);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
+			// fill window
 			runner.runClose(0.9321);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			runner.runClose(0.9205);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
 			runner.runClose(0.8000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
 			runner.runClose(0.9053);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// ******************************
 			// cross above SMA and BB
 			runner.runClose(1.2000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEUPPER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 			// ******************************
 
 			// stay above SMA
-			runner.runClose(1.1000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			runner.runClose(1.0500);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// cross below SMA
 			runner.runClose(0.9104);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
 			runner.runClose(0.7000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
 			runner.runClose(0.9104);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// cross above SMA
 			runner.runClose(1.06000);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross above BB
 			runner.runClose(1.12000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEUPPER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// ******************************
 			// cross below SMA and BB
 			runner.runClose(0.7000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 			// ******************************
 		} finally {
 			breakOutStrategy.onEnd();
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		}
 	}
 
@@ -139,12 +139,11 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getPosition() == null
-				|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
 			runner.runClose(0.9271);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 			runner.runClose(0.9271);
 			runner.runClose(0.9507);
 			runner.runClose(0.9575);
@@ -173,79 +172,79 @@ public class BreakOutStrategyTest {
 			runner.runClose(0.9285);
 			runner.runClose(0.9182);
 			runner.runClose(0.9253);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
+			// fill window
 			runner.runClose(0.9321);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			runner.runClose(0.9205);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
 			runner.runClose(0.8000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
 			runner.runClose(0.9053);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// ******************************
 			// cross above SMA and BB
 			runner.runClose(1.2000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEUPPER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 			// ******************************
 
 			// stay above SMA
-			runner.runClose(1.1000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			runner.runClose(1.0500);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// cross below SMA
 			runner.runClose(0.9104);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
 			runner.runClose(0.7000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
 			runner.runClose(0.9104);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// cross above SMA
-			runner.runClose(1.0500);
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			runner.runClose(1.06000);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross above BB
-			runner.runClose(1.1200);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			runner.runClose(1.12000);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEUPPER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// ******************************
 			// cross below SMA and BB
 			runner.runClose(0.7000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 			// ******************************
 
 			// cross above SMA and BB
 			runner.runClose(1.2000);
-			Assert.assertTrue(breakOutStrategy.getPosition() != null
-					&& breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+			Assert.assertTrue(breakOutStrategy.getBollingerLocation() == BollingerLocation.ABOVEUPPER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 		} finally {
 			breakOutStrategy.onEnd();
-			Assert.assertTrue(breakOutStrategy.getPosition() == null
-					|| breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		}
 	}
 
