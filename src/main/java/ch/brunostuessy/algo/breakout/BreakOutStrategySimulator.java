@@ -22,7 +22,7 @@ public final class BreakOutStrategySimulator {
     
 	public static void main(String[] args) {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final Strategy breakOutStrategy = new BreakOutStrategy(simulator);
 
 		final int windowSize = 30; 
 		final double initialCashBalance = 1000000;
