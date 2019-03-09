@@ -24,6 +24,7 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 30);
 		
 		breakOutStrategy.onBegin(1000000);
+		Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
 		try {
 	        runner.runClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
@@ -88,6 +89,24 @@ public class BreakOutStrategyTest {
 			// cross below BB
 			runner.runClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+
+			// stay below SMA
+			runner.runClose(0.9104);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+
+			// cross above SMA
+			runner.runClose(1.06000);
+			Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+
+			// cross above BB
+			runner.runClose(1.12000);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+
+			// ******************************
+			// cross below SMA and BB
+			runner.runClose(0.7000);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			// ******************************
 		} finally {
 			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
 			breakOutStrategy.onEnd();
@@ -107,6 +126,7 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
 		
 		breakOutStrategy.onBegin(1000000);
+		Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
 		try {
 	        runner.runClose(0.9271);
 	        Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
@@ -171,6 +191,24 @@ public class BreakOutStrategyTest {
 			// cross below BB
 			runner.runClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+
+			// stay below SMA
+			runner.runClose(0.9104);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+
+			// cross above SMA
+			runner.runClose(1.0500);
+			Assert.assertTrue(breakOutStrategy.getPosition() == null || breakOutStrategy.getPosition().getDirection() == Direction.FLAT);
+
+			// cross above BB
+			runner.runClose(1.1200);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.SHORT);
+
+			// ******************************
+			// cross below SMA and BB
+			runner.runClose(0.7000);
+			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
+			// ******************************
 		} finally {
 			Assert.assertTrue(breakOutStrategy.getPosition() != null && breakOutStrategy.getPosition().getDirection() == Direction.LONG);
 			breakOutStrategy.onEnd();
