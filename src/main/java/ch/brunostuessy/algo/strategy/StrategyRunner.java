@@ -1,4 +1,4 @@
-package ch.brunostuessy.algo.breakout;
+package ch.brunostuessy.algo.strategy;
 
 import java.util.Objects;
 import java.util.stream.DoubleStream;
@@ -56,7 +56,7 @@ public final class StrategyRunner {
 		}
 	}
 
-	protected void runClose(double close) {
+	public void runClose(double close) {
 		simulator.setCurrentPrice(close);
 
 		updateCloseStatistics(close);

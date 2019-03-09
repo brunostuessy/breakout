@@ -6,6 +6,7 @@ import org.junit.Test;
 import ch.algotrader.enumeration.Direction;
 import ch.algotrader.simulation.Simulator;
 import ch.algotrader.simulation.SimulatorImpl;
+import ch.brunostuessy.algo.strategy.StrategyRunner;
 
 /**
  * Unit tests for BreakOutStrategy.

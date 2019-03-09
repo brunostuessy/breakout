@@ -1,4 +1,4 @@
-package ch.brunostuessy.algo.breakout;
+package ch.brunostuessy.algo.provider;
 
 import java.io.IOException;
 import java.nio.file.Files;

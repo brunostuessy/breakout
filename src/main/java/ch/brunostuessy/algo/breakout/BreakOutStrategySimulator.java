@@ -8,6 +8,9 @@ import org.apache.logging.log4j.Logger;
 
 import ch.algotrader.simulation.Simulator;
 import ch.algotrader.simulation.SimulatorImpl;
+import ch.brunostuessy.algo.provider.CSVClosePriceDoubleStreamProvider;
+import ch.brunostuessy.algo.strategy.Strategy;
+import ch.brunostuessy.algo.strategy.StrategyRunner;
 
 /**
  * Runs BreakOutStrategy with close prices loaded from file EUR.USD.csv.

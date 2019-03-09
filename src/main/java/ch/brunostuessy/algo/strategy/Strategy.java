@@ -1,4 +1,4 @@
-package ch.brunostuessy.algo.breakout;
+package ch.brunostuessy.algo.strategy;
 
 import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 
