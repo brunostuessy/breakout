@@ -8,7 +8,7 @@ import ch.algotrader.simulation.Simulator;
 import ch.algotrader.simulation.SimulatorImpl;
 
 /**
- * Unit test for BreakOutStrategy.
+ * Unit tests for BreakOutStrategy.
  */
 public class BreakOutStrategyTest {
 

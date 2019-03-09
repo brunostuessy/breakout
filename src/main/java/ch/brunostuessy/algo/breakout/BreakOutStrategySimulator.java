@@ -26,7 +26,7 @@ public final class BreakOutStrategySimulator {
 
 		final int windowSize = 30; 
 		final double initialCashBalance = 1000000;
-		final String candleFilePath = "EUR.USD.csv"; 
+		final String candleFilePath = args != null && args.length == 1 ? args[0] : null; 
 		try (DoubleStream closePrices = new CSVClosePriceDoubleStreamProvider().closePrices(candleFilePath)) {
 			new StrategyRunner(breakOutStrategy, simulator, windowSize).runStrategy(initialCashBalance, closePrices);
 		} catch (final RuntimeException | IOException e) {
