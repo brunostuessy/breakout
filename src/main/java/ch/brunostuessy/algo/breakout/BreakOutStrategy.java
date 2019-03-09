@@ -71,7 +71,6 @@ public final class BreakOutStrategy implements Strategy {
 			onCloseWithinBollingerAboveMovingAverage();
 			break;
 		case ONMIDDLE:
-			onCloseWithinBollingerOnMovingAverage();
 			break;
 		default:
 		}
@@ -126,9 +125,6 @@ public final class BreakOutStrategy implements Strategy {
 		if (positionDirection == Direction.LONG) {
 			closePosition(Side.SELL);
 		}
-	}
-
-	private void onCloseWithinBollingerOnMovingAverage() {
 	}
 
 	/**
