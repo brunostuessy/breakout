@@ -24,11 +24,12 @@ public final class BreakOutStrategy implements Strategy {
 
 	private final Simulator simulator;
 
-	private BollingerLocation bollingerLocation = BollingerLocation.ONMIDDLE;
+	private BollingerLocation bollingerLocation;
 
 	public BreakOutStrategy(final Simulator simulator) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
+		updateBollingerLocation(Double.NaN, null);
 	}
 
 	/**
@@ -51,10 +52,6 @@ public final class BreakOutStrategy implements Strategy {
 	 */
 	@Override
 	public void onClose(final double close, final StatisticalSummary closeStats) {
-		if (closeStats.getN() < 1) {
-			return;
-		}
-
 		updateBollingerLocation(close, closeStats);
 
 		switch (getBollingerLocation()) {
@@ -142,6 +139,11 @@ public final class BreakOutStrategy implements Strategy {
 	}
 
 	private void updateBollingerLocation(final double close, final StatisticalSummary closeStats) {
+		if (close == Double.NaN || closeStats == null || closeStats.getN() < 1) {
+			bollingerLocation = BollingerLocation.UNKNOWN;
+			return;
+		}
+
 		final double movingAverage = closeStats.getMean();
 		final double factor = 2.0;
 		final double stddev = closeStats.getStandardDeviation();

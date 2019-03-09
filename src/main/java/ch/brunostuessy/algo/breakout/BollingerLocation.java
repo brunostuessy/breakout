@@ -8,6 +8,6 @@ package ch.brunostuessy.algo.breakout;
  */
 public enum BollingerLocation {
 
-	ABOVEUPPER(), ABOVEMIDDLE(), ONMIDDLE(), BELOWMIDDLE(), BELOWLOWER()
+	UNKNOWN(), ABOVEUPPER(), ABOVEMIDDLE(), ONMIDDLE(), BELOWMIDDLE(), BELOWLOWER()
 
 }
