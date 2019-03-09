@@ -10,31 +10,30 @@ import ch.algotrader.simulation.Simulator;
 import ch.algotrader.simulation.SimulatorImpl;
 
 /**
- * Runs BreakOutStrategy with close prices loaded from file EUR.USD.csv. 
+ * Runs BreakOutStrategy with close prices loaded from file EUR.USD.csv.
  * 
  * @author Bruno Stüssi
  *
  */
 public final class BreakOutStrategySimulator {
 
-    private static Logger logger = LogManager.getLogger(BreakOutStrategySimulator.class.getName());
+	private static Logger logger = LogManager.getLogger(BreakOutStrategySimulator.class.getName());
 
-    
 	public static void main(String[] args) {
 		final Simulator simulator = new SimulatorImpl();
 		final Strategy breakOutStrategy = new BreakOutStrategy(simulator);
 
-		final int windowSize = 30; 
+		final int windowSize = 30;
 		final double initialCashBalance = 1000000;
-		final String candleFilePath = args != null && args.length == 1 ? args[0] : null; 
+		final String candleFilePath = args != null && args.length == 1 ? args[0] : null;
 		try (DoubleStream closePrices = new CSVClosePriceDoubleStreamProvider().closePrices(candleFilePath)) {
 			new StrategyRunner(breakOutStrategy, simulator, windowSize).runStrategy(initialCashBalance, closePrices);
 		} catch (final RuntimeException | IOException e) {
 			logger.error("exception caught:", e);
 		}
 	}
-	
-	
-	private BreakOutStrategySimulator() {}
-	
+
+	private BreakOutStrategySimulator() {
+	}
+
 }

@@ -20,27 +20,25 @@ import java.util.stream.DoubleStream;
 public final class CSVClosePriceDoubleStreamProvider {
 
 	/**
-     * Provides a double stream of close prices from a CSV file.
+	 * Provides a double stream of close prices from a CSV file.
 	 * 
 	 * @param candleFilePath
 	 * @return
 	 * @throws IOException
 	 */
 	public DoubleStream closePrices(final String candleFilePath) throws IOException {
-		//final DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
+		// final DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 
-		return Files.lines(Paths.get(candleFilePath))
-		.skip(1)
-		.mapToDouble(candleData -> {
-	    	final String[] candleColumns = candleData.split(",", -1);
+		return Files.lines(Paths.get(candleFilePath)).skip(1).mapToDouble(candleData -> {
+			final String[] candleColumns = candleData.split(",", -1);
 
-	    	//final Date date = df.parse(candleColumns[0]);
-	    	//final double open = Double.parseDouble(candleColumns[1]);
-	    	//final double low = Double.parseDouble(candleColumns[2]);
-	    	//final double high = Double.parseDouble(candleColumns[3]);
-	    	final double close = Double.parseDouble(candleColumns[4]);
-	    	
-	    	return close;
+			// final Date date = df.parse(candleColumns[0]);
+			// final double open = Double.parseDouble(candleColumns[1]);
+			// final double low = Double.parseDouble(candleColumns[2]);
+			// final double high = Double.parseDouble(candleColumns[3]);
+			final double close = Double.parseDouble(candleColumns[4]);
+
+			return close;
 		});
 	}
 

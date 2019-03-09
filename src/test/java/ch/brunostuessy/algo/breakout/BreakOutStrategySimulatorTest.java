@@ -8,34 +8,31 @@ import org.junit.Test;
  */
 public class BreakOutStrategySimulatorTest {
 
-    @Test
-    public void testStrategySimulatorWithValidFile()
-    {
+	@Test
+	public void testStrategySimulatorWithValidFile() {
 		try {
-			BreakOutStrategySimulator.main(new String[] {"EUR.USD.csv"});
+			BreakOutStrategySimulator.main(new String[] { "EUR.USD.csv" });
 		} catch (final Exception e) {
 			Assert.fail();
 		}
-    }
+	}
 
-    @Test
-    public void testStrategySimulatorWithMissingFile()
-    {
+	@Test
+	public void testStrategySimulatorWithMissingFile() {
 		try {
-			BreakOutStrategySimulator.main(new String[] {"missing.csv"});
+			BreakOutStrategySimulator.main(new String[] { "missing.csv" });
 		} catch (final Exception e) {
 			Assert.fail();
 		}
-    }
+	}
 
-    @Test
-    public void testStrategySimulatorWithoutFile()
-    {
+	@Test
+	public void testStrategySimulatorWithoutFile() {
 		try {
 			BreakOutStrategySimulator.main(new String[] {});
 		} catch (final Exception e) {
 			Assert.fail();
 		}
-    }
-    
+	}
+
 }
