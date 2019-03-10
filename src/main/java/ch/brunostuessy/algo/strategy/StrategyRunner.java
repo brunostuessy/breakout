@@ -18,16 +18,16 @@ import ch.algotrader.simulation.Simulator;
  * @author Bruno Stüssi
  *
  */
-public final class StrategyRunner<T extends Enum<T>> {
+public final class StrategyRunner<S extends Enum<S>> {
 
-	private final Strategy<T> strategy;
+	private final Strategy<S> strategy;
 	private final Simulator simulator;
 	private final int windowSize;
 
 	private final DescriptiveStatistics windowCloseStats = new DescriptiveStatistics();
 	private final SummaryStatistics infiniteCloseStats = new SummaryStatistics();
 
-	public StrategyRunner(final Strategy<T> strategy, final Simulator simulator, final int windowSize) {
+	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize) {
 		Objects.requireNonNull(strategy, "strategy is null!");
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.strategy = strategy;
@@ -57,6 +57,11 @@ public final class StrategyRunner<T extends Enum<T>> {
 		}
 	}
 
+	/**
+	 * Helper method intended for testing.
+	 * 
+	 * @param close
+	 */
 	public void applyClose(double close) {
 		applyClosePrices(DoubleStream.of(close));
 	}

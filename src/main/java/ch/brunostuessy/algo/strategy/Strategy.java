@@ -8,7 +8,7 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
  * @author Bruno Stüssi
  *
  */
-public interface Strategy<T extends Enum<T>> {
+public interface Strategy<S extends Enum<S>> {
 
 	/**
 	 * Called every time when a new close price is available. Converts a close price
@@ -17,7 +17,7 @@ public interface Strategy<T extends Enum<T>> {
 	 * @param close
 	 * @param closeStats
 	 */
-	public T mapCloseToSignal(final double close, final StatisticalSummary closeStats);
+	public S mapCloseToSignal(final double close, final StatisticalSummary closeStats);
 
 	/**
 	 * Called once at the beginning to initialize cash balance.
@@ -32,7 +32,7 @@ public interface Strategy<T extends Enum<T>> {
 	 * 
 	 * @param signal
 	 */
-	public void onSignal(final T signal);
+	public void onSignal(final S signal);
 
 	/**
 	 * Called once at the end to cleanup like closing eventual positions.
