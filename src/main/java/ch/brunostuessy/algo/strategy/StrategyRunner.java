@@ -8,6 +8,7 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 import ch.algotrader.simulation.Simulator;
+import ch.brunostuessy.algo.provider.CSVClosePriceDoubleStreamProvider;
 
 /**
  * Context class to run a strategy. With window size > 0 uses
@@ -63,7 +64,9 @@ public final class StrategyRunner<S extends Enum<S>> {
 	 * @param close
 	 */
 	public void applyClose(double close) {
-		applyClosePrices(DoubleStream.of(close));
+		try (final DoubleStream closePrices = DoubleStream.of(close)) {
+			applyClosePrices(closePrices);
+		}
 	}
 
 	private void applyClosePrices(final DoubleStream closePrices) {
