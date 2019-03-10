@@ -4,9 +4,10 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 
 public final class TAUtils {
 
-	public static BandOrientation calculateBollingerBandOrientation(final double value, final StatisticalSummary valueStats) {
-		if (value == Double.NaN || valueStats == null || valueStats.getN() < 1) {
-			return BandOrientation.UNKNOWN;
+	public static BandOrientation calculateBollingerBandOrientation(final double value,
+			final StatisticalSummary valueStats) {
+		if (Double.isNaN(value) || valueStats == null || valueStats.getN() < 1) {
+			return BandOrientation.INVALID;
 		}
 
 		final double movingAverage = valueStats.getMean();
@@ -28,5 +29,6 @@ public final class TAUtils {
 		}
 	}
 
-	private TAUtils() {}
+	private TAUtils() {
+	}
 }

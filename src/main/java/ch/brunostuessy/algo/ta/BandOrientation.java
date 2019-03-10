@@ -8,6 +8,6 @@ package ch.brunostuessy.algo.ta;
  */
 public enum BandOrientation {
 
-	UNKNOWN(), ABOVEUPPER(), ABOVEMIDDLE(), ONMIDDLE(), BELOWMIDDLE(), BELOWLOWER()
+	INVALID(), ABOVEUPPER(), ABOVEMIDDLE(), ONMIDDLE(), BELOWMIDDLE(), BELOWLOWER()
 
 }

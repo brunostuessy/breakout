@@ -65,12 +65,15 @@ public final class BreakOutStrategy implements Strategy {
 			onCloseAboveBollingerUpper();
 			break;
 		case BELOWMIDDLE:
-			onCloseWithinBollingerBelowMovingAverage();
+			onCloseBelowBollingerMiddle();
 			break;
 		case ABOVEMIDDLE:
-			onCloseWithinBollingerAboveMovingAverage();
+			onCloseAboveBollingerMiddle();
 			break;
 		case ONMIDDLE:
+			break;
+		case INVALID:
+			onLeaveMarket();
 			break;
 		default:
 		}
@@ -81,12 +84,7 @@ public final class BreakOutStrategy implements Strategy {
 	 */
 	@Override
 	public void onEnd() {
-		final Direction positionDirection = getPositionDirection();
-		if (positionDirection == Direction.SHORT) {
-			closePosition(Side.BUY);
-		} else if (positionDirection == Direction.LONG) {
-			closePosition(Side.SELL);
-		}
+		onLeaveMarket();
 	}
 
 	/**
@@ -120,7 +118,7 @@ public final class BreakOutStrategy implements Strategy {
 	/**
 	 * Closes LONG position if any.
 	 */
-	private void onCloseWithinBollingerAboveMovingAverage() {
+	private void onCloseAboveBollingerMiddle() {
 		final Direction positionDirection = getPositionDirection();
 		if (positionDirection == Direction.LONG) {
 			closePosition(Side.SELL);
@@ -130,10 +128,22 @@ public final class BreakOutStrategy implements Strategy {
 	/**
 	 * Closes SHORT position if any.
 	 */
-	private void onCloseWithinBollingerBelowMovingAverage() {
+	private void onCloseBelowBollingerMiddle() {
 		final Direction positionDirection = getPositionDirection();
 		if (positionDirection == Direction.SHORT) {
 			closePosition(Side.BUY);
+		}
+	}
+
+	/**
+	 * Closes any position if any.
+	 */
+	private void onLeaveMarket() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+		} else if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
 		}
 	}
 
