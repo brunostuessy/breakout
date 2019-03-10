@@ -39,8 +39,9 @@ public final class StrategyRunner<T extends Enum<T>> {
 	}
 
 	/**
-	 * Runs a strategy streaming close prices into it including maintaining current
-	 * price of simulator and updating the close price statistics.
+	 * Runs a strategy mapping close prices to signals and streaming them into it,
+	 * including maintaining current price of simulator and updating the close price
+	 * statistics.
 	 * 
 	 * @param initialCashBalance
 	 * @param strategy
