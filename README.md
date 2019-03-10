@@ -4,6 +4,7 @@
 
 # BreakOut Strategy
 
-Initial version.
+The strategy goes long when below BB and exits when above MA,
+and vice versa goes short when above BB and exits when below MA.
 
 ![Chart](chart.png)
