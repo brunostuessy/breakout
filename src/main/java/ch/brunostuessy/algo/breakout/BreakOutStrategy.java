@@ -43,6 +43,7 @@ public final class BreakOutStrategy implements Strategy<BandOrientation> {
 	 * @param price
 	 * @param priceStats
 	 */
+	@Override
 	public BandOrientation mapPriceToSignal(final double price, final StatisticalSummary priceStats) {
 		return TAUtils.calculateBollingerBandOrientation(price, priceStats);
 	}

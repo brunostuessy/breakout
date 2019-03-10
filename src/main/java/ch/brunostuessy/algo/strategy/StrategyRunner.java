@@ -67,10 +67,10 @@ public final class StrategyRunner<S extends Enum<S>> {
 	}
 
 	private void applyPrices(final DoubleStream prices) {
-		prices.filter(price -> {
+		prices.peek(price -> {
 			simulator.setCurrentPrice(price);
-
 			updatePriceStatistics(price);
+		}).filter(price -> {
 			return arePriceStatisticsAvailable();
 		}).mapToObj(price -> {
 			return strategy.mapPriceToSignal(price, getPriceStatistics());
