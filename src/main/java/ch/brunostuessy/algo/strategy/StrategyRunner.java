@@ -40,14 +40,12 @@ public final class StrategyRunner<S extends Enum<S>> {
 	}
 
 	/**
-	 * Runs a strategy mapping prices to signals and streaming them into it,
-	 * including maintaining current price of simulator and updating the price
-	 * statistics.
+	 * Runs a strategy mapping and reducing prices to signals and streaming them
+	 * into it, including maintaining current price of simulator and updating the
+	 * price statistics.
 	 * 
 	 * @param initialCashBalance
-	 * @param strategy
 	 * @param prices
-	 * @param simulator
 	 */
 	public void runStrategy(final double initialCashBalance, final DoubleStream prices) {
 		strategy.onBegin(initialCashBalance);
