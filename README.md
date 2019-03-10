@@ -5,3 +5,5 @@
 # BreakOut Strategy
 
 Initial version.
+
+![Chart](chart.png)
