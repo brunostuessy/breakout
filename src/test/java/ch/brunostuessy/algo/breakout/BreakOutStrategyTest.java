@@ -25,11 +25,11 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 30);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.UNKNOWN);
+		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
 			runner.runClose(0.9271);
-			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.UNKNOWN);
+			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 			runner.runClose(0.9271);
 			runner.runClose(0.9507);
@@ -59,7 +59,7 @@ public class BreakOutStrategyTest {
 			runner.runClose(0.9285);
 			runner.runClose(0.9182);
 			runner.runClose(0.9253);
-			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.UNKNOWN);
+			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// fill window
@@ -141,7 +141,7 @@ public class BreakOutStrategyTest {
 		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
 
 		breakOutStrategy.onBegin(1000000);
-		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.UNKNOWN);
+		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 		try {
 			runner.runClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ONMIDDLE);
@@ -250,4 +250,38 @@ public class BreakOutStrategyTest {
 		}
 	}
 
+	/**
+	 * BDD test with invalid close price.
+	 */
+	@Test
+	public void strategyLeavesMarketWithInvalidClose() {
+		final Simulator simulator = new SimulatorImpl();
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+
+		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
+
+		breakOutStrategy.onBegin(1000000);
+		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
+		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
+		try {
+			runner.runClose(0.9271);
+			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ONMIDDLE);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
+			runner.runClose(0.9271);
+			runner.runClose(0.9507);
+			runner.runClose(0.9575);
+			runner.runClose(0.9467);
+
+			runner.runClose(0.1000);
+			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
+
+			runner.runClose(Double.NaN);
+			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
+		} finally {
+			breakOutStrategy.onEnd();
+			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
+		}
+	}
 }
