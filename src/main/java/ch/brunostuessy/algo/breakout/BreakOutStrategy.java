@@ -12,7 +12,7 @@ import ch.algotrader.enumeration.Direction;
 import ch.algotrader.enumeration.Side;
 import ch.algotrader.simulation.Simulator;
 import ch.brunostuessy.algo.strategy.Strategy;
-import ch.brunostuessy.algo.ta.BollingerLocation;
+import ch.brunostuessy.algo.ta.BandOrientation;
 
 /**
  * Implements a BreakOut Strategy against a Bollinger Band.
@@ -26,12 +26,12 @@ public final class BreakOutStrategy implements Strategy {
 
 	private final Simulator simulator;
 
-	private BollingerLocation bollingerLocation;
+	private BandOrientation bandOrientation;
 
 	public BreakOutStrategy(final Simulator simulator) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
-		updateBollingerLocation(Double.NaN, null);
+		updateBandOrientation(Double.NaN, null);
 	}
 
 	/**
@@ -54,9 +54,9 @@ public final class BreakOutStrategy implements Strategy {
 	 */
 	@Override
 	public void onClose(final double close, final StatisticalSummary closeStats) {
-		updateBollingerLocation(close, closeStats);
+		updateBandOrientation(close, closeStats);
 
-		switch (getBollingerLocation()) {
+		switch (getBandOrientation()) {
 		case BELOWLOWER:
 			onCloseBelowBollingerLower();
 			break;
@@ -136,13 +136,13 @@ public final class BreakOutStrategy implements Strategy {
 		}
 	}
 
-	protected BollingerLocation getBollingerLocation() {
-		return bollingerLocation;
+	protected BandOrientation getBandOrientation() {
+		return bandOrientation;
 	}
 
-	private void updateBollingerLocation(final double close, final StatisticalSummary closeStats) {
+	private void updateBandOrientation(final double close, final StatisticalSummary closeStats) {
 		if (close == Double.NaN || closeStats == null || closeStats.getN() < 1) {
-			bollingerLocation = BollingerLocation.UNKNOWN;
+			bandOrientation = BandOrientation.UNKNOWN;
 			return;
 		}
 
@@ -153,15 +153,15 @@ public final class BreakOutStrategy implements Strategy {
 		final double bollingerLower = movingAverage - factor * stddev;
 
 		if (close < bollingerLower) {
-			bollingerLocation = BollingerLocation.BELOWLOWER;
+			bandOrientation = BandOrientation.BELOWLOWER;
 		} else if (close > bollingerUpper) {
-			bollingerLocation = BollingerLocation.ABOVEUPPER;
+			bandOrientation = BandOrientation.ABOVEUPPER;
 		} else if (close < movingAverage) {
-			bollingerLocation = BollingerLocation.BELOWMIDDLE;
+			bandOrientation = BandOrientation.BELOWMIDDLE;
 		} else if (close > movingAverage) {
-			bollingerLocation = BollingerLocation.ABOVEMIDDLE;
+			bandOrientation = BandOrientation.ABOVEMIDDLE;
 		} else {
-			bollingerLocation = BollingerLocation.ONMIDDLE;
+			bandOrientation = BandOrientation.ONMIDDLE;
 		}
 	}
 
