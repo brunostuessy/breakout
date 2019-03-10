@@ -50,21 +50,25 @@ public final class StrategyRunner {
 	public void runStrategy(final double initialCashBalance, final DoubleStream closePrices) {
 		strategy.onBegin(initialCashBalance);
 		try {
-			closePrices.forEachOrdered(close -> runClose(close));
+			applyClosePrices(closePrices);
 		} finally {
 			strategy.onEnd();
 		}
 	}
 
-	public void runClose(double close) {
-		simulator.setCurrentPrice(close);
+	public void applyClose(double close) {
+		applyClosePrices(DoubleStream.of(close));
+	}
 
-		updateCloseStatistics(close);
-		if (!areCloseStatisticsAvailable()) {
-			return;
-		}
+	private void applyClosePrices(final DoubleStream closePrices) {
+		closePrices.filter(close -> {
+			simulator.setCurrentPrice(close);
 
-		strategy.onClose(close, getCloseStatistics());
+			updateCloseStatistics(close);
+			return areCloseStatisticsAvailable();
+		}).forEachOrdered(close -> {
+			strategy.onClose(close, getCloseStatistics());
+		});
 	}
 
 	private StatisticalSummary getCloseStatistics() {
