@@ -4,25 +4,25 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 
 public final class TAUtils {
 
-	public static BandOrientation calculateBollingerBandOrientation(final double value,
-			final StatisticalSummary valueStats) {
-		if (!Double.isFinite(value) || valueStats == null || valueStats.getN() < 1) {
+	public static BandOrientation calculateBollingerBandOrientation(final double price,
+			final StatisticalSummary priceStats) {
+		if (!Double.isFinite(price) || priceStats == null || priceStats.getN() < 1) {
 			return BandOrientation.INVALID;
 		}
 
-		final double movingAverage = valueStats.getMean();
+		final double movingAverage = priceStats.getMean();
 		final double factor = 2.0;
-		final double stddev = valueStats.getStandardDeviation();
+		final double stddev = priceStats.getStandardDeviation();
 		final double bollingerUpper = movingAverage + factor * stddev;
 		final double bollingerLower = movingAverage - factor * stddev;
 
-		if (value < bollingerLower) {
+		if (price < bollingerLower) {
 			return BandOrientation.BELOWLOWER;
-		} else if (value > bollingerUpper) {
+		} else if (price > bollingerUpper) {
 			return BandOrientation.ABOVEUPPER;
-		} else if (value < movingAverage) {
+		} else if (price < movingAverage) {
 			return BandOrientation.BELOWMIDDLE;
-		} else if (value > movingAverage) {
+		} else if (price > movingAverage) {
 			return BandOrientation.ABOVEMIDDLE;
 		} else {
 			return BandOrientation.ONMIDDLE;

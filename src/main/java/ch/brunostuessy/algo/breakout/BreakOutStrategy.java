@@ -32,18 +32,19 @@ public final class BreakOutStrategy implements Strategy<BandOrientation> {
 	public BreakOutStrategy(final Simulator simulator) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
-		bandOrientation = mapCloseToSignal(Double.NaN, null);
+		bandOrientation = mapPriceToSignal(Double.NaN, null);
 	}
 
 	/**
-	 * Called every time when a new close price is available. Converts a close price
-	 * to a signal.
+	 * Called every time when a new reference price is available. Converts a
+	 * reference price to a signal. For this strategy the reference price is
+	 * supposed to be the close price of a candle.
 	 * 
-	 * @param close
-	 * @param closeStats
+	 * @param price
+	 * @param priceStats
 	 */
-	public BandOrientation mapCloseToSignal(final double close, final StatisticalSummary closeStats) {
-		return TAUtils.calculateBollingerBandOrientation(close, closeStats);
+	public BandOrientation mapPriceToSignal(final double price, final StatisticalSummary priceStats) {
+		return TAUtils.calculateBollingerBandOrientation(price, priceStats);
 	}
 
 	/**

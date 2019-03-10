@@ -11,13 +11,13 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 public interface Strategy<S extends Enum<S>> {
 
 	/**
-	 * Called every time when a new close price is available. Converts a close price
-	 * to a signal.
+	 * Called every time when a new reference price is available. Converts a
+	 * reference price to a signal.
 	 * 
-	 * @param close
-	 * @param closeStats
+	 * @param price
+	 * @param priceStats
 	 */
-	public S mapCloseToSignal(final double close, final StatisticalSummary closeStats);
+	public S mapPriceToSignal(final double price, final StatisticalSummary priceStats);
 
 	/**
 	 * Called once at the beginning to initialize cash balance.

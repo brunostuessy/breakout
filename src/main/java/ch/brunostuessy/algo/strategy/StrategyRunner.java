@@ -25,8 +25,8 @@ public final class StrategyRunner<S extends Enum<S>> {
 	private final Simulator simulator;
 	private final int windowSize;
 
-	private final DescriptiveStatistics windowCloseStats = new DescriptiveStatistics();
-	private final SummaryStatistics infiniteCloseStats = new SummaryStatistics();
+	private final DescriptiveStatistics windowPriceStats = new DescriptiveStatistics();
+	private final SummaryStatistics infinitePriceStats = new SummaryStatistics();
 
 	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize) {
 		Objects.requireNonNull(strategy, "strategy is null!");
@@ -35,24 +35,24 @@ public final class StrategyRunner<S extends Enum<S>> {
 		this.simulator = simulator;
 		this.windowSize = windowSize;
 		if (windowSize > 0) {
-			windowCloseStats.setWindowSize(this.windowSize);
+			windowPriceStats.setWindowSize(this.windowSize);
 		}
 	}
 
 	/**
-	 * Runs a strategy mapping close prices to signals and streaming them into it,
-	 * including maintaining current price of simulator and updating the close price
+	 * Runs a strategy mapping prices to signals and streaming them into it,
+	 * including maintaining current price of simulator and updating the price
 	 * statistics.
 	 * 
 	 * @param initialCashBalance
 	 * @param strategy
-	 * @param closePrices
+	 * @param prices
 	 * @param simulator
 	 */
-	public void runStrategy(final double initialCashBalance, final DoubleStream closePrices) {
+	public void runStrategy(final double initialCashBalance, final DoubleStream prices) {
 		strategy.onBegin(initialCashBalance);
 		try {
-			applyClosePrices(closePrices);
+			applyPrices(prices);
 		} finally {
 			strategy.onEnd();
 		}
@@ -61,48 +61,48 @@ public final class StrategyRunner<S extends Enum<S>> {
 	/**
 	 * Helper method intended for testing.
 	 * 
-	 * @param close
+	 * @param price
 	 */
-	public void applyClose(double close) {
-		try (final DoubleStream closePrices = DoubleStream.of(close)) {
-			applyClosePrices(closePrices);
+	public void applyPrice(double price) {
+		try (final DoubleStream prices = DoubleStream.of(price)) {
+			applyPrices(prices);
 		}
 	}
 
-	private void applyClosePrices(final DoubleStream closePrices) {
-		closePrices.filter(close -> {
-			simulator.setCurrentPrice(close);
+	private void applyPrices(final DoubleStream prices) {
+		prices.filter(price -> {
+			simulator.setCurrentPrice(price);
 
-			updateCloseStatistics(close);
-			return areCloseStatisticsAvailable();
-		}).mapToObj(close -> {
-			return strategy.mapCloseToSignal(close, getCloseStatistics());
+			updatePriceStatistics(price);
+			return arePriceStatisticsAvailable();
+		}).mapToObj(price -> {
+			return strategy.mapPriceToSignal(price, getPriceStatistics());
 		}).distinct().forEachOrdered(signal -> {
 			strategy.onSignal(signal);
 		});
 	}
 
-	private StatisticalSummary getCloseStatistics() {
+	private StatisticalSummary getPriceStatistics() {
 		if (windowSize > 0) {
-			return windowCloseStats;
+			return windowPriceStats;
 		} else {
-			return infiniteCloseStats;
+			return infinitePriceStats;
 		}
 	}
 
-	private void updateCloseStatistics(final double close) {
+	private void updatePriceStatistics(final double price) {
 		if (windowSize > 0) {
-			windowCloseStats.addValue(close);
+			windowPriceStats.addValue(price);
 		} else {
-			infiniteCloseStats.addValue(close);
+			infinitePriceStats.addValue(price);
 		}
 	}
 
-	private boolean areCloseStatisticsAvailable() {
+	private boolean arePriceStatisticsAvailable() {
 		if (windowSize > 0) {
-			return windowCloseStats.getN() >= windowSize;
+			return windowPriceStats.getN() >= windowSize;
 		} else {
-			return infiniteCloseStats.getN() >= 1;
+			return infinitePriceStats.getN() >= 1;
 		}
 	}
 
