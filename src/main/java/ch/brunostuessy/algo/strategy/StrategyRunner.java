@@ -8,7 +8,6 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 import org.apache.commons.math.stat.descriptive.SummaryStatistics;
 
 import ch.algotrader.simulation.Simulator;
-import ch.brunostuessy.algo.provider.CSVClosePriceDoubleStreamProvider;
 
 /**
  * Context class to run a strategy. With window size > 0 uses
