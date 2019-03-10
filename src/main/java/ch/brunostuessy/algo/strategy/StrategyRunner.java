@@ -83,7 +83,7 @@ public final class StrategyRunner {
 		}
 	}
 
-	protected boolean areCloseStatisticsAvailable() {
+	private boolean areCloseStatisticsAvailable() {
 		if (windowSize > 0) {
 			return windowCloseStats.getN() >= windowSize;
 		} else {

@@ -1,4 +1,4 @@
-package ch.brunostuessy.algo.breakout;
+package ch.brunostuessy.algo.ta;
 
 /**
  * The location relative to a Bollinger Band.

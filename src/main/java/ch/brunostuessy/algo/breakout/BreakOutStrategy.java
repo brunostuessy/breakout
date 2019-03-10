@@ -12,6 +12,7 @@ import ch.algotrader.enumeration.Direction;
 import ch.algotrader.enumeration.Side;
 import ch.algotrader.simulation.Simulator;
 import ch.brunostuessy.algo.strategy.Strategy;
+import ch.brunostuessy.algo.ta.BollingerLocation;
 
 /**
  * Implements a BreakOut Strategy against a Bollinger Band.
