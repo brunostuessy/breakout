@@ -82,6 +82,7 @@ public final class BreakOutStrategy implements Strategy<BandOrientation> {
 			onCloseAboveBollingerMiddle();
 			break;
 		case ONMIDDLE:
+			// edge case, do nothing
 			break;
 		case INVALID:
 			onLeaveMarket();

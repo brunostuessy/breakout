@@ -6,7 +6,7 @@ public final class TAUtils {
 
 	public static BandOrientation calculateBollingerBandOrientation(final double value,
 			final StatisticalSummary valueStats) {
-		if (Double.isNaN(value) || valueStats == null || valueStats.getN() < 1) {
+		if (!Double.isFinite(value) || valueStats == null || valueStats.getN() < 1) {
 			return BandOrientation.INVALID;
 		}
 
