@@ -171,16 +171,19 @@ public final class BreakOutStrategy implements Strategy {
 	}
 
 	private void openPosition(final Side side) {
-		final long cashBalance = Math.round(simulator.getCashBalance() - 0.5);
-		if (cashBalance > 0) {
-			simulator.sendOrder(new MarketOrder(side, cashBalance));
+		final long quantity = Math.round(simulator.getCashBalance() - 0.5); // round down
+		if (quantity > 0) {
+			simulator.sendOrder(new MarketOrder(side, quantity));
 		}
 	}
 
 	private void closePosition(final Side side) {
 		final Position position = simulator.getPosition();
-		simulator.sendOrder(new MarketOrder(side, Math.abs(position.getQuantity())));
-		logger.info("closed position: cash balance is " + simulator.getCashBalance());
+		final long quantity = position != null ? Math.abs(position.getQuantity()) : 0;
+		if (quantity > 0) {
+			simulator.sendOrder(new MarketOrder(side, quantity));
+			logger.info("closed position: cash balance is " + simulator.getCashBalance());
+		}
 	}
 
 }
