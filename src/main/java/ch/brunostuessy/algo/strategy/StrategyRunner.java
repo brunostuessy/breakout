@@ -18,16 +18,16 @@ import ch.algotrader.simulation.Simulator;
  * @author Bruno Stüssi
  *
  */
-public final class StrategyRunner {
+public final class StrategyRunner<T extends Enum<T>> {
 
-	private final Strategy strategy;
+	private final Strategy<T> strategy;
 	private final Simulator simulator;
 	private final int windowSize;
 
 	private final DescriptiveStatistics windowCloseStats = new DescriptiveStatistics();
 	private final SummaryStatistics infiniteCloseStats = new SummaryStatistics();
 
-	public StrategyRunner(final Strategy strategy, final Simulator simulator, final int windowSize) {
+	public StrategyRunner(final Strategy<T> strategy, final Simulator simulator, final int windowSize) {
 		Objects.requireNonNull(strategy, "strategy is null!");
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.strategy = strategy;
@@ -66,8 +66,10 @@ public final class StrategyRunner {
 
 			updateCloseStatistics(close);
 			return areCloseStatisticsAvailable();
-		}).forEachOrdered(close -> {
-			strategy.onClose(close, getCloseStatistics());
+		}).mapToObj(close -> {
+			return strategy.mapCloseToSignal(close, getCloseStatistics());
+		}).distinct().forEachOrdered(signal -> {
+			strategy.onSignal(signal);
 		});
 	}
 

@@ -8,7 +8,16 @@ import org.apache.commons.math.stat.descriptive.StatisticalSummary;
  * @author Bruno Stüssi
  *
  */
-public interface Strategy {
+public interface Strategy<T extends Enum<T>> {
+
+	/**
+	 * Called every time when a new close price is available. Converts a close price
+	 * to a signal.
+	 * 
+	 * @param close
+	 * @param closeStats
+	 */
+	public T mapCloseToSignal(final double close, final StatisticalSummary closeStats);
 
 	/**
 	 * Called once at the beginning to initialize cash balance.
@@ -18,14 +27,12 @@ public interface Strategy {
 	public void onBegin(final double initialCashBalance);
 
 	/**
-	 * Called every time when a new close price is available. Here signal detection
-	 * and order and position management is supposed to take place in a continuous
-	 * manner.
+	 * Called every time when a new signal is available. Here order and position
+	 * management is supposed to take place in a continuous manner.
 	 * 
-	 * @param close
-	 * @param closeStats
+	 * @param signal
 	 */
-	public void onClose(final double close, final StatisticalSummary closeStats);
+	public void onSignal(final T signal);
 
 	/**
 	 * Called once at the end to cleanup like closing eventual positions.

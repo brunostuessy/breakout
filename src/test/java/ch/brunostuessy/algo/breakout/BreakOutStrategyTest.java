@@ -22,7 +22,8 @@ public class BreakOutStrategyTest {
 		final Simulator simulator = new SimulatorImpl();
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
 
-		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 30);
+		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
+				30);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
@@ -138,7 +139,8 @@ public class BreakOutStrategyTest {
 		final Simulator simulator = new SimulatorImpl();
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
 
-		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
+		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
+				0);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
@@ -258,7 +260,8 @@ public class BreakOutStrategyTest {
 		final Simulator simulator = new SimulatorImpl();
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
 
-		final StrategyRunner runner = new StrategyRunner(breakOutStrategy, simulator, 0);
+		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
+				0);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);

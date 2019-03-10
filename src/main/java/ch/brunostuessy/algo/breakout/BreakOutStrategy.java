@@ -21,7 +21,7 @@ import ch.brunostuessy.algo.ta.TAUtils;
  * @author Bruno Stüssi
  *
  */
-public final class BreakOutStrategy implements Strategy {
+public final class BreakOutStrategy implements Strategy<BandOrientation> {
 
 	private static Logger logger = LogManager.getLogger(BreakOutStrategy.class.getName());
 
@@ -32,7 +32,18 @@ public final class BreakOutStrategy implements Strategy {
 	public BreakOutStrategy(final Simulator simulator) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
-		updateBandOrientation(Double.NaN, null);
+		bandOrientation = mapCloseToSignal(Double.NaN, null);
+	}
+
+	/**
+	 * Called every time when a new close price is available. Converts a close price
+	 * to a signal.
+	 * 
+	 * @param close
+	 * @param closeStats
+	 */
+	public BandOrientation mapCloseToSignal(final double close, final StatisticalSummary closeStats) {
+		return TAUtils.calculateBollingerBandOrientation(close, closeStats);
 	}
 
 	/**
@@ -46,16 +57,16 @@ public final class BreakOutStrategy implements Strategy {
 	}
 
 	/**
-	 * Called every time when a new close price is available. Detects signals and
-	 * performs order management. Position is first closed if any and then opened to
-	 * support price spikes, e.g. close SHORT and open LONG in one step.
+	 * Called every time when a new signal is available. Here order and position
+	 * management is supposed to take place in a continuous manner. Position is
+	 * first closed if any and then opened to support price spikes, e.g. close SHORT
+	 * and open LONG in one step.
 	 * 
-	 * @param close
-	 * @param closeStats
+	 * @param signal
 	 */
 	@Override
-	public void onClose(final double close, final StatisticalSummary closeStats) {
-		updateBandOrientation(close, closeStats);
+	public void onSignal(final BandOrientation signal) {
+		bandOrientation = signal;
 
 		switch (getBandOrientation()) {
 		case BELOWLOWER:
@@ -149,10 +160,6 @@ public final class BreakOutStrategy implements Strategy {
 
 	protected BandOrientation getBandOrientation() {
 		return bandOrientation;
-	}
-
-	private void updateBandOrientation(final double close, final StatisticalSummary closeStats) {
-		bandOrientation = TAUtils.calculateBollingerBandOrientation(close, closeStats);
 	}
 
 	protected Direction getPositionDirection() {
