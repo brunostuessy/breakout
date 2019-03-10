@@ -50,7 +50,7 @@ public final class StrategyRunner {
 	public void runStrategy(final double initialCashBalance, final DoubleStream closePrices) {
 		strategy.onBegin(initialCashBalance);
 		try {
-			closePrices.forEach(close -> runClose(close));
+			closePrices.forEachOrdered(close -> runClose(close));
 		} finally {
 			strategy.onEnd();
 		}
