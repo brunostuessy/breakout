@@ -28,99 +28,99 @@ public class BreakOutStrategyTest {
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
-			runner.runClose(0.9271);
+			runner.applyClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
-			runner.runClose(0.9271);
-			runner.runClose(0.9507);
-			runner.runClose(0.9575);
-			runner.runClose(0.9467);
-			runner.runClose(0.9437);
-			runner.runClose(0.9366);
-			runner.runClose(0.9521);
-			runner.runClose(0.9508);
-			runner.runClose(0.9431);
-			runner.runClose(0.9421);
-			runner.runClose(0.936);
-			runner.runClose(0.9424);
-			runner.runClose(0.9346);
-			runner.runClose(0.9383);
-			runner.runClose(0.9346);
-			runner.runClose(0.9239);
-			runner.runClose(0.9244);
-			runner.runClose(0.9243);
-			runner.runClose(0.917);
-			runner.runClose(0.9262);
-			runner.runClose(0.9374);
-			runner.runClose(0.9374);
-			runner.runClose(0.9357);
-			runner.runClose(0.938);
-			runner.runClose(0.9311);
-			runner.runClose(0.9285);
-			runner.runClose(0.9182);
-			runner.runClose(0.9253);
+			runner.applyClose(0.9271);
+			runner.applyClose(0.9507);
+			runner.applyClose(0.9575);
+			runner.applyClose(0.9467);
+			runner.applyClose(0.9437);
+			runner.applyClose(0.9366);
+			runner.applyClose(0.9521);
+			runner.applyClose(0.9508);
+			runner.applyClose(0.9431);
+			runner.applyClose(0.9421);
+			runner.applyClose(0.936);
+			runner.applyClose(0.9424);
+			runner.applyClose(0.9346);
+			runner.applyClose(0.9383);
+			runner.applyClose(0.9346);
+			runner.applyClose(0.9239);
+			runner.applyClose(0.9244);
+			runner.applyClose(0.9243);
+			runner.applyClose(0.917);
+			runner.applyClose(0.9262);
+			runner.applyClose(0.9374);
+			runner.applyClose(0.9374);
+			runner.applyClose(0.9357);
+			runner.applyClose(0.938);
+			runner.applyClose(0.9311);
+			runner.applyClose(0.9285);
+			runner.applyClose(0.9182);
+			runner.applyClose(0.9253);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// fill window
-			runner.runClose(0.9321);
+			runner.applyClose(0.9321);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
-			runner.runClose(0.9205);
+			runner.applyClose(0.9205);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
-			runner.runClose(0.8000);
+			runner.applyClose(0.8000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
-			runner.runClose(0.9053);
+			runner.applyClose(0.9053);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// ******************************
 			// cross above SMA and BB
-			runner.runClose(1.2000);
+			runner.applyClose(1.2000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEUPPER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 			// ******************************
 
 			// stay above SMA
-			runner.runClose(1.0500);
+			runner.applyClose(1.0500);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// cross below SMA
-			runner.runClose(0.9104);
+			runner.applyClose(0.9104);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
-			runner.runClose(0.7000);
+			runner.applyClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
-			runner.runClose(0.9104);
+			runner.applyClose(0.9104);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// cross above SMA
-			runner.runClose(1.06000);
+			runner.applyClose(1.06000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross above BB
-			runner.runClose(1.12000);
+			runner.applyClose(1.12000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEUPPER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// ******************************
 			// cross below SMA and BB
-			runner.runClose(0.7000);
+			runner.applyClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 			// ******************************
@@ -143,105 +143,105 @@ public class BreakOutStrategyTest {
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 		try {
-			runner.runClose(0.9271);
+			runner.applyClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ONMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
-			runner.runClose(0.9271);
-			runner.runClose(0.9507);
-			runner.runClose(0.9575);
-			runner.runClose(0.9467);
-			runner.runClose(0.9437);
-			runner.runClose(0.9366);
-			runner.runClose(0.9521);
-			runner.runClose(0.9508);
-			runner.runClose(0.9431);
-			runner.runClose(0.9421);
-			runner.runClose(0.936);
-			runner.runClose(0.9424);
-			runner.runClose(0.9346);
-			runner.runClose(0.9383);
-			runner.runClose(0.9346);
-			runner.runClose(0.9239);
-			runner.runClose(0.9244);
-			runner.runClose(0.9243);
-			runner.runClose(0.917);
-			runner.runClose(0.9262);
-			runner.runClose(0.9374);
-			runner.runClose(0.9374);
-			runner.runClose(0.9357);
-			runner.runClose(0.938);
-			runner.runClose(0.9311);
-			runner.runClose(0.9285);
-			runner.runClose(0.9182);
-			runner.runClose(0.9253);
+			runner.applyClose(0.9271);
+			runner.applyClose(0.9507);
+			runner.applyClose(0.9575);
+			runner.applyClose(0.9467);
+			runner.applyClose(0.9437);
+			runner.applyClose(0.9366);
+			runner.applyClose(0.9521);
+			runner.applyClose(0.9508);
+			runner.applyClose(0.9431);
+			runner.applyClose(0.9421);
+			runner.applyClose(0.936);
+			runner.applyClose(0.9424);
+			runner.applyClose(0.9346);
+			runner.applyClose(0.9383);
+			runner.applyClose(0.9346);
+			runner.applyClose(0.9239);
+			runner.applyClose(0.9244);
+			runner.applyClose(0.9243);
+			runner.applyClose(0.917);
+			runner.applyClose(0.9262);
+			runner.applyClose(0.9374);
+			runner.applyClose(0.9374);
+			runner.applyClose(0.9357);
+			runner.applyClose(0.938);
+			runner.applyClose(0.9311);
+			runner.applyClose(0.9285);
+			runner.applyClose(0.9182);
+			runner.applyClose(0.9253);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// fill window
-			runner.runClose(0.9321);
+			runner.applyClose(0.9321);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
-			runner.runClose(0.9205);
+			runner.applyClose(0.9205);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
-			runner.runClose(0.8000);
+			runner.applyClose(0.8000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
-			runner.runClose(0.9053);
+			runner.applyClose(0.9053);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// ******************************
 			// cross above SMA and BB
-			runner.runClose(1.2000);
+			runner.applyClose(1.2000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEUPPER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 			// ******************************
 
 			// stay above SMA
-			runner.runClose(1.0500);
+			runner.applyClose(1.0500);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// cross below SMA
-			runner.runClose(0.9104);
+			runner.applyClose(0.9104);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross below BB
-			runner.runClose(0.7000);
+			runner.applyClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// stay below SMA
-			runner.runClose(0.9104);
+			runner.applyClose(0.9104);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
 			// cross above SMA
-			runner.runClose(1.06000);
+			runner.applyClose(1.06000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 
 			// cross above BB
-			runner.runClose(1.12000);
+			runner.applyClose(1.12000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEUPPER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 
 			// ******************************
 			// cross below SMA and BB
-			runner.runClose(0.7000);
+			runner.applyClose(0.7000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 			// ******************************
 
 			// cross above SMA and BB
-			runner.runClose(1.2000);
+			runner.applyClose(1.2000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ABOVEUPPER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.SHORT);
 		} finally {
@@ -264,19 +264,19 @@ public class BreakOutStrategyTest {
 		Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 		Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		try {
-			runner.runClose(0.9271);
+			runner.applyClose(0.9271);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.ONMIDDLE);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
-			runner.runClose(0.9271);
-			runner.runClose(0.9507);
-			runner.runClose(0.9575);
-			runner.runClose(0.9467);
+			runner.applyClose(0.9271);
+			runner.applyClose(0.9507);
+			runner.applyClose(0.9575);
+			runner.applyClose(0.9467);
 
-			runner.runClose(0.1000);
+			runner.applyClose(0.1000);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.BELOWLOWER);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.LONG);
 
-			runner.runClose(Double.NaN);
+			runner.applyClose(Double.NaN);
 			Assert.assertTrue(breakOutStrategy.getBandOrientation() == BandOrientation.INVALID);
 			Assert.assertTrue(breakOutStrategy.getPositionDirection() == Direction.FLAT);
 		} finally {
