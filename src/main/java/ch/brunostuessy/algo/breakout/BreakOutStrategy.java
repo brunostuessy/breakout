@@ -13,6 +13,7 @@ import ch.algotrader.enumeration.Side;
 import ch.algotrader.simulation.Simulator;
 import ch.brunostuessy.algo.strategy.Strategy;
 import ch.brunostuessy.algo.ta.BandOrientation;
+import ch.brunostuessy.algo.ta.TAUtils;
 
 /**
  * Implements a BreakOut Strategy against a Bollinger Band.
@@ -141,28 +142,7 @@ public final class BreakOutStrategy implements Strategy {
 	}
 
 	private void updateBandOrientation(final double close, final StatisticalSummary closeStats) {
-		if (close == Double.NaN || closeStats == null || closeStats.getN() < 1) {
-			bandOrientation = BandOrientation.UNKNOWN;
-			return;
-		}
-
-		final double movingAverage = closeStats.getMean();
-		final double factor = 2.0;
-		final double stddev = closeStats.getStandardDeviation();
-		final double bollingerUpper = movingAverage + factor * stddev;
-		final double bollingerLower = movingAverage - factor * stddev;
-
-		if (close < bollingerLower) {
-			bandOrientation = BandOrientation.BELOWLOWER;
-		} else if (close > bollingerUpper) {
-			bandOrientation = BandOrientation.ABOVEUPPER;
-		} else if (close < movingAverage) {
-			bandOrientation = BandOrientation.BELOWMIDDLE;
-		} else if (close > movingAverage) {
-			bandOrientation = BandOrientation.ABOVEMIDDLE;
-		} else {
-			bandOrientation = BandOrientation.ONMIDDLE;
-		}
+		bandOrientation = TAUtils.calculateBollingerBandOrientation(close, closeStats);
 	}
 
 	protected Direction getPositionDirection() {
