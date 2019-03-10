@@ -5,7 +5,7 @@
 
 # BreakOut Strategy
 
-The strategy goes long when below BB and exits when above MA,
-and vice versa goes short when above BB and exits when below MA.
+The strategy goes long when close price crosses below BB and exits when crosses above MA,
+and vice versa goes short when close price crosses above BB and exits when crosses below MA.
 
 ![Chart](chart.png)
