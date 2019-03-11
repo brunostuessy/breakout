@@ -7,7 +7,15 @@
 
 # BreakOut Strategy
 
+## Functionality
+
 The strategy goes long when close price crosses below BB and exits when crosses above MA,
 and vice versa goes short when close price crosses above BB and exits when crosses below MA.
 
 ![Chart](chart.png)
+
+## Technology
+
+### Language
+
+The code is based on Java 8 and leverages Java Stream API for running the strategy.
