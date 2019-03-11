@@ -19,3 +19,14 @@ and vice versa goes short when close price crosses above BB and exits when cross
 ### Language
 
 The code is based on Java 8 and leverages Java Stream API for running the strategy.
+
+## Quality
+
+### Code
+
+Code quality is measured automatically by two code analyzers and targets zero issues.
+
+### Test
+
+Code coverage by tests is measured automatically by one tool and targets 100%.
+
