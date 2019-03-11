@@ -1,5 +1,6 @@
 package ch.brunostuessy.algo.strategy;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.DoubleStream;
 
@@ -20,12 +21,14 @@ import ch.algotrader.simulation.Simulator;
  */
 public final class StrategyRunner<S extends Enum<S>> {
 
-	private final Strategy<S> strategy;
 	private final Simulator simulator;
-	private final int windowSize;
+	private final Strategy<S> strategy;
 
+	private final int windowSize;
 	private final DescriptiveStatistics windowPriceStats = new DescriptiveStatistics();
 	private final SummaryStatistics infinitePriceStats = new SummaryStatistics();
+
+	private S lastSignal;
 
 	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize) {
 		Objects.requireNonNull(strategy, "strategy is null!");
@@ -36,6 +39,7 @@ public final class StrategyRunner<S extends Enum<S>> {
 		if (windowSize > 0) {
 			windowPriceStats.setWindowSize(this.windowSize);
 		}
+		lastSignal = strategy.mapPriceToSignal(Double.NaN, null);
 	}
 
 	/**
@@ -74,7 +78,15 @@ public final class StrategyRunner<S extends Enum<S>> {
 			return arePriceStatisticsAvailable();
 		}).mapToObj(price -> {
 			return strategy.mapPriceToSignal(price, getPriceStatistics());
-		}).distinct().forEachOrdered(signal -> {
+		}).map(signal -> { // filter repeated signals
+			return Arrays.asList(lastSignal, signal);
+		}).filter(signalPair -> {
+			return signalPair.get(1) != signalPair.get(0);
+		}).map(signalPair -> {
+			return signalPair.get(1);
+		}).peek(signal -> { // filter repeated signals
+			lastSignal = signal;
+		}).forEachOrdered(signal -> {
 			strategy.onSignal(signal);
 		});
 	}
