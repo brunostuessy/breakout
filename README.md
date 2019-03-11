@@ -30,3 +30,4 @@ Code quality is measured automatically by two code analyzers and targets zero is
 
 Code coverage by tests is measured automatically by one tool and targets 100%.
 
+
