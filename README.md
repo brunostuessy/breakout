@@ -4,6 +4,7 @@
 [![lgtm code quality](https://img.shields.io/lgtm/grade/java/g/brunostuessy/breakout.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/brunostuessy/breakout/context:java)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c309b085ff9949fa8403078c87d0138f)](https://www.codacy.com/app/brunostuessy/breakout?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brunostuessy/breakout&amp;utm_campaign=Badge_Grade)
 [![Coverage Status](https://coveralls.io/repos/github/brunostuessy/breakout/badge.svg?branch=master&service=github&chksum)](https://coveralls.io/github/brunostuessy/breakout?branch=master)
+[![Known Vulnerabilities](https://snyk.io/test/github/brunostuessy/breakout/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/brunostuessy/breakout?targetFile=pom.xml)
 
 # BreakOut Strategy
 
@@ -28,4 +29,8 @@ Code quality is measured automatically by two code analyzers and targets zero is
 
 ### Test
 
-Code coverage by tests is measured automatically by one tool and targets 100%.
+Code coverage by tests is measured automatically by one coverage tool and targets 100%.
+
+### Security
+
+Library quality is measured automatically by one security analyzer and targets zero issues.
