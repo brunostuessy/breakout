@@ -5,7 +5,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/c309b085ff9949fa8403078c87d0138f)](https://www.codacy.com/app/brunostuessy/breakout?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=brunostuessy/breakout&amp;utm_campaign=Badge_Grade)
 </br>
 [![codecov.io](http://codecov.io/github/brunostuessy/breakout/coverage.svg?branch=master)](https://codecov.io/gh/brunostuessy/breakout/branch/master)
-[![Coverage Status](https://coveralls.io/repos/github/brunostuessy/breakout/badge.svg?branch=master&service=github&chksum)](https://coveralls.io/github/brunostuessy/breakout?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/brunostuessy/breakout/badge.svg?branch=master&service=github&checksum)](https://coveralls.io/github/brunostuessy/breakout?branch=master)
 </br>
 [![Known Vulnerabilities](https://snyk.io/test/github/brunostuessy/breakout/badge.svg?targetFile=pom.xml)](https://snyk.io/test/github/brunostuessy/breakout?targetFile=pom.xml)
 
