@@ -6,4 +6,4 @@ script:
   - mvn verify
 
 after_success:
-- mvn clean test jacoco:report coveralls:report cobertura:cobertura
+- mvn clean test jacoco:report coveralls:report
