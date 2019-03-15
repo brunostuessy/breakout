@@ -28,12 +28,12 @@ The code is based on Java 8 and leverages Java Stream API for running the strate
 
 ### Code
 
-Code quality is measured automatically by two code analyzers and targets zero issues.
+Code quality is measured automatically by two analyzers and targets zero issues.
 
 ### Test
 
-Code coverage by tests is measured automatically by one coverage tool and targets 100%.
+Code coverage by tests is measured automatically by two analyzers and targets >=95%.
 
 ### Security
 
-Library quality is measured automatically by one security analyzer and targets zero issues.
+Library quality is measured automatically by one analyzer and targets zero issues.
