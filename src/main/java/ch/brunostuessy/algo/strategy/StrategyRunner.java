@@ -28,9 +28,13 @@ public final class StrategyRunner<S extends Enum<S>> {
 	private final DescriptiveStatistics windowPriceStats = new DescriptiveStatistics();
 	private final SummaryStatistics infinitePriceStats = new SummaryStatistics();
 
+	private final boolean useLookaheadPrice;
+
+	private double lastPrice;
 	private S lastSignal;
 
-	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize) {
+	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize,
+			final boolean useLookaheadPrice) {
 		Objects.requireNonNull(strategy, "strategy is null!");
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.strategy = strategy;
@@ -39,6 +43,9 @@ public final class StrategyRunner<S extends Enum<S>> {
 		if (windowSize > 0) {
 			windowPriceStats.setWindowSize(this.windowSize);
 		}
+		this.useLookaheadPrice = useLookaheadPrice;
+
+		lastPrice = Double.NaN;
 		lastSignal = strategy.mapPriceToSignal(Double.NaN, null);
 	}
 
@@ -73,19 +80,28 @@ public final class StrategyRunner<S extends Enum<S>> {
 	private void applyPrices(final DoubleStream prices) {
 		prices.peek(price -> {
 			simulator.setCurrentPrice(price);
+		}).map(price -> { // use lookahead or lookback price
+			if (useLookaheadPrice) {
+				final double previousPrice = lastPrice;
+				lastPrice = price;
+				return previousPrice;
+			} else {
+				return price;
+			}
+		}).peek(price -> {
 			updatePriceStatistics(price);
 		}).filter(price -> {
 			return arePriceStatisticsAvailable();
 		}).mapToObj(price -> {
 			return strategy.mapPriceToSignal(price, getPriceStatistics());
-		}).map(signal -> { // filter repeated signals
+		}).map(signal -> { // reduce repeated signals
 			return Arrays.asList(lastSignal, signal);
 		}).filter(signalPair -> {
 			return signalPair.get(1) != signalPair.get(0);
-		}).map(signalPair -> {
-			return signalPair.get(1);
-		}).peek(signal -> { // filter repeated signals
+		}).map(signalPair -> { // reduce repeated signals
+			S signal = signalPair.get(1);
 			lastSignal = signal;
+			return signal;
 		}).forEachOrdered(signal -> {
 			strategy.onSignal(signal);
 		});
@@ -100,6 +116,10 @@ public final class StrategyRunner<S extends Enum<S>> {
 	}
 
 	private void updatePriceStatistics(final double price) {
+		if (!Double.isFinite(price)) {
+			return;
+		}
+
 		if (windowSize > 0) {
 			windowPriceStats.addValue(price);
 		} else {

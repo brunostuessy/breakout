@@ -31,8 +31,8 @@ public final class BreakOutStrategySimulator {
 		final double initialCashBalance = 1000000;
 		final String candleFilePath = args != null && args.length == 1 ? args[0] : null;
 		try (final DoubleStream closePrices = new CSVClosePriceDoubleStreamProvider().closePrices(candleFilePath)) {
-			new StrategyRunner<BandOrientation>(breakOutStrategy, simulator, windowSize).runStrategy(initialCashBalance,
-					closePrices);
+			new StrategyRunner<BandOrientation>(breakOutStrategy, simulator, windowSize, false)
+					.runStrategy(initialCashBalance, closePrices);
 		} catch (final RuntimeException | IOException e) {
 			logger.error("exception caught:", e);
 		}
