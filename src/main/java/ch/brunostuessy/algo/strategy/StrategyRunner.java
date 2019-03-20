@@ -1,6 +1,7 @@
 package ch.brunostuessy.algo.strategy;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 import java.util.stream.DoubleStream;
 
@@ -33,15 +34,14 @@ public final class StrategyRunner<S extends Enum<S>> {
 	private double lastPrice;
 	private DistinctLastFilter<S> distinctLastSignalFilter;
 
-	private final static class DistinctLastFilter<T> implements Predicate<T> {
+	private final static class DistinctLastFilter<V> implements Predicate<V> {
 
-		private T lastValue;
+		private final AtomicReference<V> lastValue = new AtomicReference<V>();
 
 		@Override
-		public boolean test(final T value) {
-			final T previousValue = lastValue;
-			lastValue = value;
-			return !Objects.equals(value, previousValue);
+		public boolean test(final V newValue) {
+			final V oldValue = lastValue.getAndSet(newValue);
+			return !Objects.equals(newValue, oldValue);
 		}
 
 	}
