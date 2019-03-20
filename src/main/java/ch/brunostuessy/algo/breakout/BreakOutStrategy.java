@@ -70,7 +70,7 @@ public final class BreakOutStrategy implements Strategy<BandOrientation> {
 	public void onSignal(final BandOrientation signal) {
 		bandOrientation = signal;
 
-		switch (getBandOrientation()) {
+		switch (bandOrientation) {
 		case BELOWLOWER:
 			onCloseBelowBollingerLower();
 			break;

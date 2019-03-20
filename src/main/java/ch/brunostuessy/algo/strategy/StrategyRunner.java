@@ -1,7 +1,7 @@
 package ch.brunostuessy.algo.strategy;
 
-import java.util.Arrays;
 import java.util.Objects;
+import java.util.function.Predicate;
 import java.util.stream.DoubleStream;
 
 import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
@@ -21,6 +21,19 @@ import ch.algotrader.simulation.Simulator;
  */
 public final class StrategyRunner<S extends Enum<S>> {
 
+	private static class DistinctLastFilter<T> implements Predicate<T> {
+
+		private T lastValue;
+
+		@Override
+		public boolean test(final T value) {
+			final T previousValue = lastValue;
+			lastValue = value;
+			return !Objects.equals(value, previousValue);
+		}
+
+	}
+
 	private final Simulator simulator;
 	private final Strategy<S> strategy;
 
@@ -31,7 +44,7 @@ public final class StrategyRunner<S extends Enum<S>> {
 	private final boolean useLookaheadPrice;
 
 	private double lastPrice;
-	private S lastSignal;
+	private DistinctLastFilter<S> distinctLastSignalFilter;
 
 	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize,
 			final boolean useLookaheadPrice) {
@@ -46,7 +59,8 @@ public final class StrategyRunner<S extends Enum<S>> {
 		this.useLookaheadPrice = useLookaheadPrice;
 
 		lastPrice = Double.NaN;
-		lastSignal = strategy.mapPriceToSignal(Double.NaN, null);
+		distinctLastSignalFilter = new DistinctLastFilter<S>();
+		distinctLastSignalFilter.test(strategy.mapPriceToSignal(Double.NaN, null));
 	}
 
 	/**
@@ -94,14 +108,8 @@ public final class StrategyRunner<S extends Enum<S>> {
 			return arePriceStatisticsAvailable();
 		}).mapToObj(price -> {
 			return strategy.mapPriceToSignal(price, getPriceStatistics());
-		}).map(signal -> { // reduce repeated signals
-			return Arrays.asList(lastSignal, signal);
-		}).filter(signalPair -> {
-			return signalPair.get(1) != signalPair.get(0);
-		}).map(signalPair -> { // reduce repeated signals
-			S signal = signalPair.get(1);
-			lastSignal = signal;
-			return signal;
+		}).filter(signal -> {
+			return distinctLastSignalFilter.test(signal);
 		}).forEachOrdered(signal -> {
 			strategy.onSignal(signal);
 		});
