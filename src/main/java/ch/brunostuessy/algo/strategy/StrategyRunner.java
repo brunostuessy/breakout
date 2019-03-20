@@ -21,19 +21,6 @@ import ch.algotrader.simulation.Simulator;
  */
 public final class StrategyRunner<S extends Enum<S>> {
 
-	private static class DistinctLastFilter<T> implements Predicate<T> {
-
-		private T lastValue;
-
-		@Override
-		public boolean test(final T value) {
-			final T previousValue = lastValue;
-			lastValue = value;
-			return !Objects.equals(value, previousValue);
-		}
-
-	}
-
 	private final Simulator simulator;
 	private final Strategy<S> strategy;
 
@@ -45,6 +32,19 @@ public final class StrategyRunner<S extends Enum<S>> {
 
 	private double lastPrice;
 	private DistinctLastFilter<S> distinctLastSignalFilter;
+
+	private final static class DistinctLastFilter<T> implements Predicate<T> {
+
+		private T lastValue;
+
+		@Override
+		public boolean test(final T value) {
+			final T previousValue = lastValue;
+			lastValue = value;
+			return !Objects.equals(value, previousValue);
+		}
+
+	}
 
 	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize,
 			final boolean useLookaheadPrice) {
