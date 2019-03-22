@@ -2,7 +2,6 @@ package ch.brunostuessy.algo.breakout;
 
 import java.util.Objects;
 
-import org.apache.commons.math.stat.descriptive.StatisticalSummary;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -21,31 +20,23 @@ import ch.brunostuessy.algo.ta.TAUtils;
  * @author Bruno Stüssi
  *
  */
-public final class BreakOutStrategy implements Strategy<BandOrientation> {
+public final class BreakOutStrategy implements Strategy<PriceWithStatistics, BandOrientation> {
 
 	private static Logger logger = LogManager.getLogger(BreakOutStrategy.class.getName());
 
 	private final Simulator simulator;
 
+	private PriceWithStatistics priceWithStatistics;
+	private final double stddevFactor;
+
 	private BandOrientation bandOrientation;
 
-	public BreakOutStrategy(final Simulator simulator) {
+	public BreakOutStrategy(final Simulator simulator, final int windowSize, final double stddevFactor) {
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.simulator = simulator;
-		bandOrientation = mapPriceToSignal(Double.NaN, null);
-	}
-
-	/**
-	 * Called every time when a new reference price is available. Converts a
-	 * reference price to a signal. For this strategy the reference price is
-	 * supposed to be the close price of a candle.
-	 * 
-	 * @param price
-	 * @param priceStats
-	 */
-	@Override
-	public BandOrientation mapPriceToSignal(final double price, final StatisticalSummary priceStats) {
-		return TAUtils.calculateBollingerBandOrientation(price, priceStats);
+		priceWithStatistics = new PriceWithStatistics(windowSize);
+		this.stddevFactor = stddevFactor;
+		bandOrientation = mapPriceStatsToSignal(priceWithStatistics);
 	}
 
 	/**
@@ -56,6 +47,36 @@ public final class BreakOutStrategy implements Strategy<BandOrientation> {
 	@Override
 	public void onBegin(final double initialCashBalance) {
 		simulator.setCashBalance(initialCashBalance);
+	}
+
+	/**
+	 * Called every time when a new reference price is available. Converts the price
+	 * to a price statistics. For this strategy the reference price is supposed to
+	 * be the close price of a candle.
+	 * 
+	 * @param price
+	 */
+	@Override
+	public PriceWithStatistics mapPriceToPriceStats(final double price) {
+		priceWithStatistics.addValue(price);
+		return priceWithStatistics;
+	}
+
+	/**
+	 * Called every time when a new reference price is available. Converts the price
+	 * statistics to a signal. For this strategy the reference price is supposed to
+	 * be the close price of a candle.
+	 * 
+	 * @param price
+	 */
+	@Override
+	public BandOrientation mapPriceStatsToSignal(final PriceWithStatistics priceStats) {
+		if (priceStats.isValid()) {
+			return TAUtils.calculateBollingerBandOrientation(priceStats.getLast(), priceStats.getStatistics(),
+					stddevFactor);
+		} else {
+			return BandOrientation.INVALID;
+		}
 	}
 
 	/**

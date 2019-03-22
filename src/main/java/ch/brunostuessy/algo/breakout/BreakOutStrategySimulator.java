@@ -25,13 +25,14 @@ public final class BreakOutStrategySimulator {
 
 	public static void main(String[] args) {
 		final Simulator simulator = new SimulatorImpl();
-		final Strategy<BandOrientation> breakOutStrategy = new BreakOutStrategy(simulator);
 
-		final int windowSize = 30;
+		final Strategy<PriceWithStatistics, BandOrientation> breakOutStrategy = new BreakOutStrategy(simulator, 30,
+				2.0);
+
 		final double initialCashBalance = 1000000;
 		final String candleFilePath = args != null && args.length == 1 ? args[0] : null;
 		try (final DoubleStream closePrices = new CSVClosePriceDoubleStreamProvider().closePrices(candleFilePath)) {
-			new StrategyRunner<BandOrientation>(breakOutStrategy, simulator, windowSize, false)
+			new StrategyRunner<PriceWithStatistics, BandOrientation>(breakOutStrategy, simulator, false)
 					.runStrategy(initialCashBalance, closePrices);
 		} catch (final RuntimeException | IOException e) {
 			logger.error("exception caught:", e);

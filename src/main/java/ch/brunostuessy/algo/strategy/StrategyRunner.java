@@ -1,66 +1,38 @@
 package ch.brunostuessy.algo.strategy;
 
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Predicate;
 import java.util.stream.DoubleStream;
 
-import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
-import org.apache.commons.math.stat.descriptive.StatisticalSummary;
-import org.apache.commons.math.stat.descriptive.SummaryStatistics;
-
 import ch.algotrader.simulation.Simulator;
+import ch.brunostuessy.algo.function.DistinctUntilChangedFilter;
 
 /**
- * Context class to run a strategy. With window size > 0 uses
- * DescriptiveStatistics and calls strategy after window is full. With window
- * size 0 uses SummaryStatistics for continuous mode and calls strategy after
- * first close price.
- * 
+ * Context class to run a strategy.
+ *
  * @author Bruno Stüssi
  *
+ * @param <P> the type representing the price statistics
+ * @param <S> the type representing a signal
  */
-public final class StrategyRunner<S extends Enum<S>> {
+public final class StrategyRunner<P, S> {
 
 	private final Simulator simulator;
-	private final Strategy<S> strategy;
-
-	private final int windowSize;
-	private final DescriptiveStatistics windowPriceStats = new DescriptiveStatistics();
-	private final SummaryStatistics infinitePriceStats = new SummaryStatistics();
+	private final Strategy<P, S> strategy;
 
 	private final boolean useLookaheadPrice;
 
 	private double lastPrice;
-	private DistinctLastFilter<S> distinctLastSignalFilter;
+	private DistinctUntilChangedFilter<S> distinctUntilChangedSignalFilter;
 
-	private final static class DistinctLastFilter<V> implements Predicate<V> {
-
-		private final AtomicReference<V> lastValue = new AtomicReference<V>();
-
-		@Override
-		public boolean test(final V newValue) {
-			final V oldValue = lastValue.getAndSet(newValue);
-			return !Objects.equals(newValue, oldValue);
-		}
-
-	}
-
-	public StrategyRunner(final Strategy<S> strategy, final Simulator simulator, final int windowSize,
-			final boolean useLookaheadPrice) {
+	public StrategyRunner(final Strategy<P, S> strategy, final Simulator simulator, final boolean useLookaheadPrice) {
 		Objects.requireNonNull(strategy, "strategy is null!");
 		Objects.requireNonNull(simulator, "simulator is null!");
 		this.strategy = strategy;
 		this.simulator = simulator;
-		this.windowSize = windowSize;
-		if (windowSize > 0) {
-			windowPriceStats.setWindowSize(this.windowSize);
-		}
 		this.useLookaheadPrice = useLookaheadPrice;
 
 		lastPrice = Double.NaN;
-		distinctLastSignalFilter = new DistinctLastFilter<S>();
-		distinctLastSignalFilter.test(strategy.mapPriceToSignal(Double.NaN, null));
+		distinctUntilChangedSignalFilter = new DistinctUntilChangedFilter<S>();
 	}
 
 	/**
@@ -102,45 +74,15 @@ public final class StrategyRunner<S extends Enum<S>> {
 			} else {
 				return price;
 			}
-		}).peek(price -> {
-			updatePriceStatistics(price);
-		}).filter(price -> {
-			return arePriceStatisticsAvailable();
 		}).mapToObj(price -> {
-			return strategy.mapPriceToSignal(price, getPriceStatistics());
+			return strategy.mapPriceToPriceStats(price);
+		}).map(priceStats -> {
+			return strategy.mapPriceStatsToSignal(priceStats);
 		}).filter(signal -> {
-			return distinctLastSignalFilter.test(signal);
+			return distinctUntilChangedSignalFilter.test(signal);
 		}).forEachOrdered(signal -> {
 			strategy.onSignal(signal);
 		});
-	}
-
-	private StatisticalSummary getPriceStatistics() {
-		if (windowSize > 0) {
-			return windowPriceStats;
-		} else {
-			return infinitePriceStats;
-		}
-	}
-
-	private void updatePriceStatistics(final double price) {
-		if (!Double.isFinite(price)) {
-			return;
-		}
-
-		if (windowSize > 0) {
-			windowPriceStats.addValue(price);
-		} else {
-			infinitePriceStats.addValue(price);
-		}
-	}
-
-	private boolean arePriceStatisticsAvailable() {
-		if (windowSize > 0) {
-			return windowPriceStats.getN() >= windowSize;
-		} else {
-			return infinitePriceStats.getN() >= 1;
-		}
 	}
 
 }

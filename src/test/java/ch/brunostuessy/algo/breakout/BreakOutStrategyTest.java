@@ -20,10 +20,10 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithWindowSize30UseLookback() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 30, 2.0);
 
-		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
-				30, false);
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+				breakOutStrategy, simulator, false);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -137,10 +137,10 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithoutWindowUseLookback() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
 
-		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
-				0, false);
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+				breakOutStrategy, simulator, false);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -259,10 +259,10 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithWindowSize30UseLookahead() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 30, 2.0);
 
-		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
-				30, true);
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+				breakOutStrategy, simulator, true);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -390,10 +390,10 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithoutWindowUseLookahead() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
 
-		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
-				0, true);
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+				breakOutStrategy, simulator, true);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -524,12 +524,12 @@ public class BreakOutStrategyTest {
 	 * BDD test with invalid close price.
 	 */
 	@Test
-	public void strategyLeavesMarketWithInvalidClose() {
+	public void strategyIgnoresInvalidClose() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
 
-		final StrategyRunner<BandOrientation> runner = new StrategyRunner<BandOrientation>(breakOutStrategy, simulator,
-				0, true);
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+				breakOutStrategy, simulator, true);
 
 		breakOutStrategy.onBegin(1000000);
 		Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -550,9 +550,10 @@ public class BreakOutStrategyTest {
 			Assert.assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
 			Assert.assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
 
+			// ignore non-finite price
 			runner.applyPrice(0.2000);
-			Assert.assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-			Assert.assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			Assert.assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+			Assert.assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
 		} finally {
 			breakOutStrategy.onEnd();
 			Assert.assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());

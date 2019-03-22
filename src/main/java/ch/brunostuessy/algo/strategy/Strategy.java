@@ -1,23 +1,14 @@
 package ch.brunostuessy.algo.strategy;
 
-import org.apache.commons.math.stat.descriptive.StatisticalSummary;
-
 /**
  * Interface to define the calling contract for a strategy.
- * 
+ *
  * @author Bruno Stüssi
  *
+ * @param <P> the type representing the price statistics
+ * @param <S> the type representing a signal
  */
-public interface Strategy<S extends Enum<S>> {
-
-	/**
-	 * Called every time when a new reference price is available. Converts a
-	 * reference price to a signal.
-	 * 
-	 * @param price
-	 * @param priceStats
-	 */
-	public S mapPriceToSignal(final double price, final StatisticalSummary priceStats);
+public interface Strategy<P, S> {
 
 	/**
 	 * Called once at the beginning to initialize cash balance.
@@ -25,6 +16,22 @@ public interface Strategy<S extends Enum<S>> {
 	 * @param initialCashBalance
 	 */
 	public void onBegin(final double initialCashBalance);
+
+	/**
+	 * Called every time when a new reference price is available. Converts the price
+	 * to a price statistics.
+	 * 
+	 * @param price
+	 */
+	public P mapPriceToPriceStats(final double price);
+
+	/**
+	 * Called every time when a new reference price is available. Converts the price
+	 * statistics to a signal.
+	 * 
+	 * @param priceStats
+	 */
+	public S mapPriceStatsToSignal(final P priceStats);
 
 	/**
 	 * Called every time when a new signal is available. Here order and position
