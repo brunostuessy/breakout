@@ -1,6 +1,6 @@
 package ch.brunostuessy.algo.breakout;
 
-import org.junit.jupiter.api.Assertions;
+import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -13,7 +13,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] { "EUR.USD.csv" });
 		} catch (final Exception e) {
-			Assertions.fail();
+			fail();
 		}
 	}
 
@@ -22,7 +22,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] { "missing.csv" });
 		} catch (final Exception e) {
-			Assertions.fail();
+			fail();
 		}
 	}
 
@@ -31,7 +31,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] {});
 		} catch (final Exception e) {
-			Assertions.fail();
+			fail();
 		}
 	}
 
