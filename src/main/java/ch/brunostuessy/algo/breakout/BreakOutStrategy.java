@@ -67,7 +67,7 @@ public final class BreakOutStrategy implements Strategy<PriceWithStatistics, Ban
 	 * statistics to a signal. For this strategy the reference price is supposed to
 	 * be the close price of a candle.
 	 * 
-	 * @param price
+	 * @param priceStats
 	 */
 	@Override
 	public BandOrientation mapPriceStatsToSignal(final PriceWithStatistics priceStats) {
