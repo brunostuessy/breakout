@@ -1,7 +1,7 @@
 package ch.brunostuessy.algo.breakout;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Unit tests for BreakOutStrategySimulator.
@@ -13,7 +13,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] { "EUR.USD.csv" });
 		} catch (final Exception e) {
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 
@@ -22,7 +22,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] { "missing.csv" });
 		} catch (final Exception e) {
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 
@@ -31,7 +31,7 @@ public class BreakOutStrategySimulatorTest {
 		try {
 			BreakOutStrategySimulator.main(new String[] {});
 		} catch (final Exception e) {
-			Assert.fail();
+			Assertions.fail();
 		}
 	}
 

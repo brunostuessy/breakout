@@ -1,10 +1,11 @@
 package ch.brunostuessy.algo.breakout;
 
-import org.junit.runners.Suite;
+import org.junit.platform.runner.JUnitPlatform;
+import org.junit.platform.suite.api.SelectClasses;
 import org.junit.runner.RunWith;
 
-@RunWith(Suite.class)
-@Suite.SuiteClasses({ BreakOutStrategyTest.class, BreakOutStrategySimulatorTest.class })
+@RunWith(JUnitPlatform.class)
+@SelectClasses({ BreakOutStrategyTest.class, BreakOutStrategySimulatorTest.class })
 public class BreakOutStrategyTestSuite {
 
 }
