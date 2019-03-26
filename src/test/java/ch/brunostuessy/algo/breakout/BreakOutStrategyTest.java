@@ -1,6 +1,7 @@
 package ch.brunostuessy.algo.breakout;
 
 import static org.junit.jupiter.api.Assertions.*;
+
 import org.junit.jupiter.api.Test;
 
 import ch.algotrader.enumeration.Direction;
@@ -8,6 +9,8 @@ import ch.algotrader.simulation.Simulator;
 import ch.algotrader.simulation.SimulatorImpl;
 import ch.brunostuessy.algo.strategy.StrategyRunner;
 import ch.brunostuessy.algo.ta.BandOrientation;
+import reactor.test.StepVerifier;
+import reactor.test.publisher.TestPublisher;
 
 /**
  * Unit tests for BreakOutStrategy.
@@ -20,114 +23,140 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithWindowSize30UseLookback() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 30, 2.0);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(30, 2.0);
 
 		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
 				breakOutStrategy, simulator, false);
 
-		breakOutStrategy.onBegin(1000000);
+		runner.onBegin(1000000);
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-		assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		try {
-			runner.applyPrice(0.9271);
-			assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
-			runner.applyPrice(0.9271);
-			runner.applyPrice(0.9507);
-			runner.applyPrice(0.9575);
-			runner.applyPrice(0.9467);
-			runner.applyPrice(0.9437);
-			runner.applyPrice(0.9366);
-			runner.applyPrice(0.9521);
-			runner.applyPrice(0.9508);
-			runner.applyPrice(0.9431);
-			runner.applyPrice(0.9421);
-			runner.applyPrice(0.936);
-			runner.applyPrice(0.9424);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9383);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9239);
-			runner.applyPrice(0.9244);
-			runner.applyPrice(0.9243);
-			runner.applyPrice(0.917);
-			runner.applyPrice(0.9262);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9357);
-			runner.applyPrice(0.938);
-			runner.applyPrice(0.9311);
-			runner.applyPrice(0.9285);
-			runner.applyPrice(0.9182);
-			runner.applyPrice(0.9253);
-			assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			final TestPublisher<Double> pricer = TestPublisher.create();
+			StepVerifier.create(runner.buildPipeline(pricer.flux())) 
+
+			.then(() -> pricer.next(0.9271))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
+			.then(() -> pricer.next(0.9271))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9575))
+			.then(() -> pricer.next(0.9467))
+			.then(() -> pricer.next(0.9437))
+			.then(() -> pricer.next(0.9366))
+			.then(() -> pricer.next(0.9521))
+			.then(() -> pricer.next(0.9508))
+			.then(() -> pricer.next(0.9431))
+			.then(() -> pricer.next(0.9421))
+			.then(() -> pricer.next(0.936))
+			.then(() -> pricer.next(0.9424))
+			.then(() -> pricer.next(0.9346))
+			.then(() -> pricer.next(0.9383))
+			.then(() -> pricer.next(0.9346))
+			.then(() -> pricer.next(0.9239))
+			.then(() -> pricer.next(0.9244))
+			.then(() -> pricer.next(0.9243))
+			.then(() -> pricer.next(0.917))
+			.then(() -> pricer.next(0.9262))
+			.then(() -> pricer.next(0.9374))
+			.then(() -> pricer.next(0.9374))
+			.then(() -> pricer.next(0.9357))
+			.then(() -> pricer.next(0.938))
+			.then(() -> pricer.next(0.9311))
+			.then(() -> pricer.next(0.9285))
+			.then(() -> pricer.next(0.9182))
+			.then(() -> pricer.next(0.9253))
 
 			// fill window
-			runner.applyPrice(0.9321);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9321))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
-			runner.applyPrice(0.9205);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9205))
 
 			// cross below BB
-			runner.applyPrice(0.8000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.8000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			runner.applyPrice(0.9053);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9053))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross above SMA and BB
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// stay above SMA
-			runner.applyPrice(1.0500);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.0500))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// cross below SMA
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross below BB
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// cross above SMA
-			runner.applyPrice(1.06000);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.06000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross above BB
-			runner.applyPrice(1.12000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.12000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross below SMA and BB
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 			// ******************************
+
+		    .then(() -> pricer.complete())
+		    .verifyComplete();
 		} finally {
-			breakOutStrategy.onEnd();
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			runner.onEnd();
+			assertEquals(Direction.FLAT, runner.getPositionDirection());
 		}
 	}
 
@@ -137,119 +166,143 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithoutWindowUseLookback() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
 		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
 				breakOutStrategy, simulator, false);
 
-		breakOutStrategy.onBegin(1000000);
+		runner.onBegin(1000000);
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-		assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		try {
-			runner.applyPrice(0.9271);
-			assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
-			runner.applyPrice(0.9271);
-			runner.applyPrice(0.9507);
-			runner.applyPrice(0.9575);
-			runner.applyPrice(0.9467);
-			runner.applyPrice(0.9437);
-			runner.applyPrice(0.9366);
-			runner.applyPrice(0.9521);
-			runner.applyPrice(0.9508);
-			runner.applyPrice(0.9431);
-			runner.applyPrice(0.9421);
-			runner.applyPrice(0.936);
-			runner.applyPrice(0.9424);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9383);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9239);
-			runner.applyPrice(0.9244);
-			runner.applyPrice(0.9243);
-			runner.applyPrice(0.917);
-			runner.applyPrice(0.9262);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9357);
-			runner.applyPrice(0.938);
-			runner.applyPrice(0.9311);
-			runner.applyPrice(0.9285);
-			runner.applyPrice(0.9182);
-			runner.applyPrice(0.9253);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			final TestPublisher<Double> pricer = TestPublisher.create();
+			StepVerifier.create(runner.buildPipeline(pricer.flux())) 
+
+			.then(() -> pricer.next(0.9507))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
 
 			// fill window
-			runner.applyPrice(0.9321);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9321))
 
-			runner.applyPrice(0.9205);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9205))
 
 			// cross below BB
-			runner.applyPrice(0.8000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.8000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			runner.applyPrice(0.9053);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9053))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross above SMA and BB
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// stay above SMA
-			runner.applyPrice(1.0500);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.0500))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// cross below SMA
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross below BB
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// cross above SMA
-			runner.applyPrice(1.06000);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.06000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross above BB
-			runner.applyPrice(1.12000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.12000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross below SMA and BB
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// cross above SMA and BB
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
+
+		    .then(() -> pricer.complete())
+		    .verifyComplete();
 		} finally {
-			breakOutStrategy.onEnd();
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			runner.onEnd();
+			assertEquals(Direction.FLAT, runner.getPositionDirection());
 		}
 	}
 
@@ -259,128 +312,153 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithWindowSize30UseLookahead() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 30, 2.0);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(30, 2.0);
 
 		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
 				breakOutStrategy, simulator, true);
 
-		breakOutStrategy.onBegin(1000000);
+		runner.onBegin(1000000);
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-		assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		try {
-			runner.applyPrice(0.9271);
-			runner.applyPrice(0.9271);
-			assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
-			// runner.applyPrice(0.9271);
-			runner.applyPrice(0.9507);
-			runner.applyPrice(0.9575);
-			runner.applyPrice(0.9467);
-			runner.applyPrice(0.9437);
-			runner.applyPrice(0.9366);
-			runner.applyPrice(0.9521);
-			runner.applyPrice(0.9508);
-			runner.applyPrice(0.9431);
-			runner.applyPrice(0.9421);
-			runner.applyPrice(0.936);
-			runner.applyPrice(0.9424);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9383);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9239);
-			runner.applyPrice(0.9244);
-			runner.applyPrice(0.9243);
-			runner.applyPrice(0.917);
-			runner.applyPrice(0.9262);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9357);
-			runner.applyPrice(0.938);
-			runner.applyPrice(0.9311);
-			runner.applyPrice(0.9285);
-			runner.applyPrice(0.9182);
-			runner.applyPrice(0.9253);
-			runner.applyPrice(0.9321);
-			assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			final TestPublisher<Double> pricer = TestPublisher.create();
+			StepVerifier.create(runner.buildPipeline(pricer.flux())) 
+
+			.then(() -> pricer.next(0.9271))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
+			.then(() -> pricer.next(0.9271))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9575))
+			.then(() -> pricer.next(0.9467))
+			.then(() -> pricer.next(0.9437))
+			.then(() -> pricer.next(0.9366))
+			.then(() -> pricer.next(0.9521))
+			.then(() -> pricer.next(0.9508))
+			.then(() -> pricer.next(0.9431))
+			.then(() -> pricer.next(0.9421))
+			.then(() -> pricer.next(0.936))
+			.then(() -> pricer.next(0.9424))
+			.then(() -> pricer.next(0.9346))
+			.then(() -> pricer.next(0.9383))
+			.then(() -> pricer.next(0.9346))
+			.then(() -> pricer.next(0.9239))
+			.then(() -> pricer.next(0.9244))
+			.then(() -> pricer.next(0.9243))
+			.then(() -> pricer.next(0.917))
+			.then(() -> pricer.next(0.9262))
+			.then(() -> pricer.next(0.9374))
+			.then(() -> pricer.next(0.9374))
+			.then(() -> pricer.next(0.9357))
+			.then(() -> pricer.next(0.938))
+			.then(() -> pricer.next(0.9311))
+			.then(() -> pricer.next(0.9285))
+			.then(() -> pricer.next(0.9182))
+			.then(() -> pricer.next(0.9253))
+			.then(() -> pricer.next(0.9321))
 
 			// fill window
-			// runner.applyPrice(0.9321);
-			runner.applyPrice(0.9205);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9321))
+			.then(() -> pricer.next(0.9205))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
-			// runner.applyPrice(0.9205);
-			runner.applyPrice(0.8000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9205))
+			.then(() -> pricer.next(0.8000))
 
 			// cross below BB
-			// runner.applyPrice(0.8000);
-			runner.applyPrice(0.9053);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.8000))
+			.then(() -> pricer.next(0.9053))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			// runner.applyPrice(0.9053);
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9053))
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross above SMA and BB
-			// runner.applyPrice(1.2000);
-			runner.applyPrice(1.0500);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.2000))
+			.then(() -> pricer.next(1.0500))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// stay above SMA
-			// runner.applyPrice(1.0500);
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.0500))
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// cross below SMA
-			// runner.applyPrice(0.9104);
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9104))
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross below BB
-			// runner.applyPrice(0.7000);
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.7000))
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			// runner.applyPrice(0.9104);
-			runner.applyPrice(1.06000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9104))
+			.then(() -> pricer.next(1.06000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// cross above SMA
-			// runner.applyPrice(1.06000);
-			runner.applyPrice(1.12000);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.06000))
+			.then(() -> pricer.next(1.12000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross above BB
-			// runner.applyPrice(1.12000);
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.12000))
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross below SMA and BB
-			// runner.applyPrice(0.7000);
-			runner.applyPrice(1.0000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.7000))
+			.then(() -> pricer.next(1.0000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 			// ******************************
+
+		    .then(() -> pricer.complete())
+		    .verifyComplete();
 		} finally {
-			breakOutStrategy.onEnd();
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			runner.onEnd();
+			assertEquals(Direction.FLAT, runner.getPositionDirection());
 		}
 	}
 
@@ -390,133 +468,161 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyWithoutWindowUseLookahead() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
 		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
 				breakOutStrategy, simulator, true);
 
-		breakOutStrategy.onBegin(1000000);
+		runner.onBegin(1000000);
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-		assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		try {
-			runner.applyPrice(0.9271);
-			runner.applyPrice(0.9507);
-			assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
-			// runner.applyPrice(0.9507);
-			runner.applyPrice(0.9575);
-			runner.applyPrice(0.9467);
-			runner.applyPrice(0.9437);
-			runner.applyPrice(0.9366);
-			runner.applyPrice(0.9521);
-			runner.applyPrice(0.9508);
-			runner.applyPrice(0.9431);
-			runner.applyPrice(0.9421);
-			runner.applyPrice(0.936);
-			runner.applyPrice(0.9424);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9383);
-			runner.applyPrice(0.9346);
-			runner.applyPrice(0.9239);
-			runner.applyPrice(0.9244);
-			runner.applyPrice(0.9243);
-			runner.applyPrice(0.917);
-			runner.applyPrice(0.9262);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9374);
-			runner.applyPrice(0.9357);
-			runner.applyPrice(0.938);
-			runner.applyPrice(0.9311);
-			runner.applyPrice(0.9285);
-			runner.applyPrice(0.9182);
-			runner.applyPrice(0.9253);
-			runner.applyPrice(0.9321);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			final TestPublisher<Double> pricer = TestPublisher.create();
+			StepVerifier.create(runner.buildPipeline(pricer.flux())) 
+			
+			.then(() -> pricer.next(0.9507))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
+			.then(() -> pricer.next(0.9507))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
+			// .then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
+			.then(() -> pricer.next(0.9507))
 
 			// fill window
-			// runner.applyPrice(0.9321);
-			runner.applyPrice(0.9205);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9321))
+			.then(() -> pricer.next(0.9205))
 
-			// runner.applyPrice(0.9205);
-			runner.applyPrice(0.8000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9205))
+			.then(() -> pricer.next(0.8000))
 
 			// cross below BB
-			// runner.applyPrice(0.8000);
-			runner.applyPrice(0.9053);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.8000))
+			.then(() -> pricer.next(0.9053))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			// runner.applyPrice(0.9053);
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9053))
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross above SMA and BB
-			// runner.applyPrice(1.2000);
-			runner.applyPrice(1.0500);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.2000))
+			.then(() -> pricer.next(1.0500))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// stay above SMA
-			// runner.applyPrice(1.0500);
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.0500))
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// cross below SMA
-			// runner.applyPrice(0.9104);
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9104))
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross below BB
-			// runner.applyPrice(0.7000);
-			runner.applyPrice(0.9104);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.7000))
+			.then(() -> pricer.next(0.9104))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// stay below SMA
-			// runner.applyPrice(0.9104);
-			runner.applyPrice(1.06000);
-			assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.9104))
+			.then(() -> pricer.next(1.06000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 
 			// cross above SMA
-			// runner.applyPrice(1.06000);
-			runner.applyPrice(1.12000);
-			assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.06000))
+			.then(() -> pricer.next(1.12000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEMIDDLE, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.FLAT, runner.getPositionDirection());
+	    	})
 
 			// cross above BB
-			// runner.applyPrice(1.12000);
-			runner.applyPrice(0.7000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.12000))
+			.then(() -> pricer.next(0.7000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
 
 			// ******************************
 			// cross below SMA and BB
-			// runner.applyPrice(0.7000);
-			runner.applyPrice(1.2000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(0.7000))
+			.then(() -> pricer.next(1.2000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.LONG, runner.getPositionDirection());
+	    	})
 			// ******************************
 
 			// cross above SMA and BB
-			// runner.applyPrice(1.2000);
-			runner.applyPrice(1.0000);
-			assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.SHORT, breakOutStrategy.getPositionDirection());
+			// .then(() -> pricer.next(1.2000))
+			.then(() -> pricer.next(1.0000))
+		    .assertNext(ac -> {
+				assertEquals(BandOrientation.ABOVEUPPER, breakOutStrategy.getBandOrientation());
+				assertEquals(Direction.SHORT, runner.getPositionDirection());
+	    	})
+
+		    .then(() -> pricer.complete())
+		    .verifyComplete();
 		} finally {
-			breakOutStrategy.onEnd();
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			runner.onEnd();
+			assertEquals(Direction.FLAT, runner.getPositionDirection());
 		}
 	}
 
@@ -526,37 +632,45 @@ public class BreakOutStrategyTest {
 	@Test
 	public void strategyIgnoresInvalidClose() {
 		final Simulator simulator = new SimulatorImpl();
-		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(simulator, 0, 2.0);
+		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
 		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
 				breakOutStrategy, simulator, true);
 
-		breakOutStrategy.onBegin(1000000);
+		runner.onBegin(1000000);
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
-		assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		try {
-			runner.applyPrice(0.9271);
-
-			runner.applyPrice(0.9271);
-			assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
-			runner.applyPrice(0.9271);
-			runner.applyPrice(0.9507);
-			runner.applyPrice(0.9575);
-			runner.applyPrice(0.9467);
-
-			runner.applyPrice(0.1000);
-			runner.applyPrice(Double.POSITIVE_INFINITY);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
-
-			// ignore non-finite price
-			runner.applyPrice(0.2000);
-			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
-			assertEquals(Direction.LONG, breakOutStrategy.getPositionDirection());
+			final TestPublisher<Double> pricer = TestPublisher.create();
+			StepVerifier.create(runner.buildPipeline(pricer.flux())) 
+			    .then(() -> pricer.next(0.9271))
+			    .assertNext(ac -> {
+					assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
+					assertEquals(Direction.FLAT, runner.getPositionDirection());
+		    	})
+			    .then(() -> pricer.next(0.9271))
+			    .assertNext(ac -> {
+					assertEquals(BandOrientation.ONMIDDLE, breakOutStrategy.getBandOrientation());
+					assertEquals(Direction.FLAT, runner.getPositionDirection());
+		    	})
+			    .then(() -> pricer.next(0.9261, 0.9251, 0.9241))
+			    .then(() -> pricer.next(0.1000, Double.POSITIVE_INFINITY))
+			    .assertNext(ac -> {
+					assertEquals(BandOrientation.BELOWMIDDLE, breakOutStrategy.getBandOrientation());
+					assertEquals(Direction.FLAT, runner.getPositionDirection());
+		    	})
+				// ignore non-finite price
+			    .then(() -> pricer.next(0.2000))
+			    .assertNext(ac -> {
+					assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
+					assertEquals(Direction.LONG, runner.getPositionDirection());
+		    	})
+			    .then(() -> pricer.complete())
+			    .verifyComplete();
 		} finally {
-			breakOutStrategy.onEnd();
-			assertEquals(Direction.FLAT, breakOutStrategy.getPositionDirection());
+			runner.onEnd();
+			assertEquals(Direction.FLAT, runner.getPositionDirection());
 		}
 	}
+
 }

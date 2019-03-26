@@ -1,10 +1,16 @@
 package ch.brunostuessy.algo.strategy;
 
 import java.util.Objects;
-import java.util.stream.DoubleStream;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import ch.algotrader.entity.Position;
+import ch.algotrader.entity.trade.MarketOrder;
+import ch.algotrader.enumeration.Direction;
+import ch.algotrader.enumeration.Side;
 import ch.algotrader.simulation.Simulator;
-import ch.brunostuessy.algo.function.DistinctUntilChangedFilter;
+import reactor.core.publisher.Flux;
 
 /**
  * Context class to run a strategy.
@@ -16,13 +22,14 @@ import ch.brunostuessy.algo.function.DistinctUntilChangedFilter;
  */
 public final class StrategyRunner<P, S> {
 
+	private static Logger logger = LogManager.getLogger(StrategyRunner.class.getName());
+
 	private final Simulator simulator;
 	private final Strategy<P, S> strategy;
 
 	private final boolean useLookaheadPrice;
 
 	private double lastPrice;
-	private DistinctUntilChangedFilter<S> distinctUntilChangedSignalFilter;
 
 	public StrategyRunner(final Strategy<P, S> strategy, final Simulator simulator, final boolean useLookaheadPrice) {
 		Objects.requireNonNull(strategy, "strategy is null!");
@@ -32,7 +39,6 @@ public final class StrategyRunner<P, S> {
 		this.useLookaheadPrice = useLookaheadPrice;
 
 		lastPrice = Double.NaN;
-		distinctUntilChangedSignalFilter = new DistinctUntilChangedFilter<S>();
 	}
 
 	/**
@@ -43,46 +49,160 @@ public final class StrategyRunner<P, S> {
 	 * @param initialCashBalance
 	 * @param prices
 	 */
-	public void runStrategy(final double initialCashBalance, final DoubleStream prices) {
-		strategy.onBegin(initialCashBalance);
+	public void runStrategy(final double initialCashBalance, final Flux<Double> prices) {
+		onBegin(initialCashBalance);
 		try {
-			applyPrices(prices);
+			buildPipeline(prices).subscribe();
 		} finally {
-			strategy.onEnd();
+			onEnd();
 		}
 	}
 
 	/**
-	 * Helper method intended for testing.
+	 * Called once at the beginning to initialize cash balance.
 	 * 
-	 * @param price
+	 * @param initialCashBalance
 	 */
-	public void applyPrice(double price) {
-		try (final DoubleStream prices = DoubleStream.of(price)) {
-			applyPrices(prices);
-		}
+	public void onBegin(final double initialCashBalance) {
+		simulator.setCashBalance(initialCashBalance);
 	}
 
-	private void applyPrices(final DoubleStream prices) {
-		prices.peek(price -> {
+	/**
+	 * Builds the price stream execution pipeline. Position is first closed if any
+	 * and then opened to support price spikes, e.g. close SHORT and open LONG in
+	 * one step.
+	 * 
+	 * @param prices
+	 */
+	public Flux<PositionSignal> buildPipeline(final Flux<Double> prices) {
+		final Flux<Double> marketPrices = prices.doOnNext(price -> {
 			simulator.setCurrentPrice(price);
-		}).map(price -> { // use lookahead or lookback price
-			if (useLookaheadPrice) {
-				final double previousPrice = lastPrice;
-				lastPrice = price;
-				return previousPrice;
-			} else {
-				return price;
-			}
-		}).mapToObj(price -> {
+		});
+		final Flux<Double> tradePrices = !useLookaheadPrice ? marketPrices : marketPrices.map(price -> {
+			final double previousPrice = lastPrice;
+			lastPrice = price;
+			return previousPrice;
+		});
+		return tradePrices.map(price -> {
 			return strategy.mapPriceToPriceStats(price);
 		}).map(priceStats -> {
 			return strategy.mapPriceStatsToSignal(priceStats);
-		}).filter(signal -> {
-			return distinctUntilChangedSignalFilter.test(signal);
-		}).forEachOrdered(signal -> {
-			strategy.onSignal(signal);
+		}).distinctUntilChanged().map(signal -> {
+			return strategy.mapSignalToPositionSignal(signal);
+		}).doOnNext(positionSignal -> {
+			doApplyPositionSignal(positionSignal);
 		});
+	}
+
+	/**
+	 * Called once at the end to close eventual positions.
+	 */
+	public void onEnd() {
+		doCloseAllPositions();
+	}
+
+	private void doApplyPositionSignal(final PositionSignal positionSignal) {
+		switch (positionSignal) {
+		case OPENLONG:
+			doOpenLongPosition();
+			break;
+		case OPENSHORT:
+			doOpenShortPosition();
+			break;
+		case CLOSESHORT:
+			doCloseShortPosition();
+			break;
+		case CLOSELONG:
+			doCloseLongPosition();
+			break;
+		case NONE:
+			break;
+		case INVALID:
+			doCloseAllPositions();
+			break;
+		default:
+		}
+	}
+
+	public Direction getPositionDirection() {
+		final Position position = simulator.getPosition();
+		return position != null ? position.getDirection() : Direction.FLAT;
+	}
+
+	/**
+	 * Opens LONG position if none including closing any SHORT position ahead.
+	 */
+	private void doOpenLongPosition() {
+		Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+			positionDirection = getPositionDirection();
+		}
+		if (positionDirection == Direction.FLAT) {
+			openPosition(Side.BUY);
+		}
+	}
+
+	/**
+	 * Opens SHORT position if none including closing any LONG position ahead.
+	 */
+	private void doOpenShortPosition() {
+		Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
+			positionDirection = getPositionDirection();
+		}
+		if (positionDirection == Direction.FLAT) {
+			openPosition(Side.SELL);
+		}
+	}
+
+	/**
+	 * Closes LONG position if any.
+	 */
+	private void doCloseLongPosition() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
+		}
+	}
+
+	/**
+	 * Closes SHORT position if any.
+	 */
+	private void doCloseShortPosition() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+		}
+	}
+
+	/**
+	 * Closes any position if any.
+	 */
+	private void doCloseAllPositions() {
+		final Direction positionDirection = getPositionDirection();
+		if (positionDirection == Direction.SHORT) {
+			closePosition(Side.BUY);
+		} else if (positionDirection == Direction.LONG) {
+			closePosition(Side.SELL);
+		}
+	}
+
+	private void openPosition(final Side side) {
+		final long quantity = Math.round(simulator.getCashBalance() - 0.5); // round down
+		if (quantity > 0) {
+			simulator.sendOrder(new MarketOrder(side, quantity));
+		}
+	}
+
+	private void closePosition(final Side side) {
+		final Position position = simulator.getPosition();
+		final long quantity = position != null ? Math.abs(position.getQuantity()) : 0;
+		if (quantity > 0) {
+			simulator.sendOrder(new MarketOrder(side, quantity));
+			logger.info("closed position: cash balance is " + simulator.getCashBalance());
+		}
 	}
 
 }
