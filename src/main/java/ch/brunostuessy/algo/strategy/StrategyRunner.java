@@ -1,6 +1,7 @@
 package ch.brunostuessy.algo.strategy;
 
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +30,7 @@ public final class StrategyRunner<P, S> {
 
 	private final boolean useLookaheadPrice;
 
-	private double lastPrice;
+	private AtomicReference<Double> lastPrice = new AtomicReference<>();
 
 	public StrategyRunner(final Strategy<P, S> strategy, final Simulator simulator, final boolean useLookaheadPrice) {
 		Objects.requireNonNull(strategy, "strategy is null!");
@@ -38,7 +39,7 @@ public final class StrategyRunner<P, S> {
 		this.simulator = simulator;
 		this.useLookaheadPrice = useLookaheadPrice;
 
-		lastPrice = Double.NaN;
+		lastPrice.set(Double.NaN);
 	}
 
 	/**
@@ -50,38 +51,25 @@ public final class StrategyRunner<P, S> {
 	 * @param prices
 	 */
 	public void runStrategy(final double initialCashBalance, final Flux<Double> prices) {
-		onBegin(initialCashBalance);
-		try {
-			buildPipeline(prices).subscribe();
-		} finally {
-			onEnd();
-		}
-	}
-
-	/**
-	 * Called once at the beginning to initialize cash balance.
-	 * 
-	 * @param initialCashBalance
-	 */
-	public void onBegin(final double initialCashBalance) {
-		simulator.setCashBalance(initialCashBalance);
+		prepareStrategy(initialCashBalance, prices).subscribe();
 	}
 
 	/**
 	 * Builds the price stream execution pipeline. Position is first closed if any
 	 * and then opened to support price spikes, e.g. close SHORT and open LONG in
-	 * one step.
+	 * one step. At the end eventual positions are closed.
 	 * 
+	 * @param initialCashBalance
 	 * @param prices
 	 */
-	public Flux<PositionSignal> buildPipeline(final Flux<Double> prices) {
+	public Flux<PositionSignal> prepareStrategy(final double initialCashBalance, final Flux<Double> prices) {
+		simulator.setCashBalance(initialCashBalance);
+
 		final Flux<Double> marketPrices = prices.doOnNext(price -> {
 			simulator.setCurrentPrice(price);
 		});
 		final Flux<Double> tradePrices = !useLookaheadPrice ? marketPrices : marketPrices.map(price -> {
-			final double previousPrice = lastPrice;
-			lastPrice = price;
-			return previousPrice;
+			return lastPrice.getAndSet(price);
 		});
 		return tradePrices.map(price -> {
 			return strategy.mapPriceToPriceStats(price);
@@ -91,14 +79,9 @@ public final class StrategyRunner<P, S> {
 			return strategy.mapSignalToPositionSignal(signal);
 		}).doOnNext(positionSignal -> {
 			doApplyPositionSignal(positionSignal);
+		}).doFinally(signalType -> {
+			doCloseAllPositions();
 		});
-	}
-
-	/**
-	 * Called once at the end to close eventual positions.
-	 */
-	public void onEnd() {
-		doCloseAllPositions();
 	}
 
 	private void doApplyPositionSignal(final PositionSignal positionSignal) {
