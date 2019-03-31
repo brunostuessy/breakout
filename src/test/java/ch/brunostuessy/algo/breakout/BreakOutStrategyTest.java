@@ -2,6 +2,9 @@ package ch.brunostuessy.algo.breakout;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.Duration;
+import java.time.temporal.ChronoUnit;
+
 import org.junit.jupiter.api.Test;
 
 import ch.algotrader.enumeration.Direction;
@@ -30,7 +33,7 @@ public class BreakOutStrategyTest {
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
 
 		final TestPublisher<Double> pricer = TestPublisher.create();
-		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux())) 
+		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux().timeout(Duration.of(100, ChronoUnit.MILLIS)))) 
 
 		.then(() -> pricer.next(0.9271))
 	    .assertNext(ac -> {
@@ -169,7 +172,7 @@ public class BreakOutStrategyTest {
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
 
 		final TestPublisher<Double> pricer = TestPublisher.create();
-		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux())) 
+		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux().timeout(Duration.of(100, ChronoUnit.MILLIS)))) 
 
 		.then(() -> pricer.next(0.9507))
 	    .assertNext(ac -> {
@@ -311,7 +314,7 @@ public class BreakOutStrategyTest {
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
 
 		final TestPublisher<Double> pricer = TestPublisher.create();
-		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux())) 
+		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux().timeout(Duration.of(100, ChronoUnit.MILLIS)))) 
 
 		.then(() -> pricer.next(0.9271))
 	    .assertNext(ac -> {
@@ -463,7 +466,7 @@ public class BreakOutStrategyTest {
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
 		
 		final TestPublisher<Double> pricer = TestPublisher.create();
-		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux())) 
+		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux().timeout(Duration.of(100, ChronoUnit.MILLIS)))) 
 		
 		.then(() -> pricer.next(0.9507))
 	    .assertNext(ac -> {
@@ -623,7 +626,7 @@ public class BreakOutStrategyTest {
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
 
 		final TestPublisher<Double> pricer = TestPublisher.create();
-		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux())) 
+		StepVerifier.create(runner.prepareStrategy(1000000, pricer.flux().timeout(Duration.of(100, ChronoUnit.MILLIS)))) 
 
 	    .then(() -> pricer.next(0.9271))
 	    .assertNext(ac -> {
