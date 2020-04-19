@@ -26,7 +26,7 @@ public class BreakOutStrategyTest {
 	public void strategyWithWindowSize30UseLookback() {
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(30, 2.0);
 
-		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<>(
 				breakOutStrategy, new SimulatorImpl(), false);
 
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -165,7 +165,7 @@ public class BreakOutStrategyTest {
 	public void strategyWithoutWindowUseLookback() {
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
-		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<>(
 				breakOutStrategy, new SimulatorImpl(), false);
 
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -307,7 +307,7 @@ public class BreakOutStrategyTest {
 	public void strategyWithWindowSize30UseLookahead() {
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(30, 2.0);
 
-		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<>(
 				breakOutStrategy, new SimulatorImpl(), true);
 
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -459,7 +459,7 @@ public class BreakOutStrategyTest {
 	public void strategyWithoutWindowUseLookahead() {
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
-		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<>(
 				breakOutStrategy, new SimulatorImpl(), true);
 
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());
@@ -619,7 +619,7 @@ public class BreakOutStrategyTest {
 	public void strategyIgnoresInvalidClose() {
 		final BreakOutStrategy breakOutStrategy = new BreakOutStrategy(0, 2.0);
 
-		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<PriceWithStatistics, BandOrientation>(
+		final StrategyRunner<PriceWithStatistics, BandOrientation> runner = new StrategyRunner<>(
 				breakOutStrategy, new SimulatorImpl(), true);
 
 		assertEquals(BandOrientation.INVALID, breakOutStrategy.getBandOrientation());

@@ -13,7 +13,7 @@ import ch.brunostuessy.algo.ta.TAUtils;
  */
 public final class BreakOutStrategy implements Strategy<PriceWithStatistics, BandOrientation> {
 
-	private PriceWithStatistics priceWithStatistics;
+	private final PriceWithStatistics priceWithStatistics;
 	private final double stddevFactor;
 
 	private BandOrientation bandOrientation;
@@ -62,7 +62,7 @@ public final class BreakOutStrategy implements Strategy<PriceWithStatistics, Ban
 	 */
 	@Override
 	public PositionSignal mapSignalToPositionSignal(final BandOrientation signal) {
-		PositionSignal positionSignal = PositionSignal.INVALID;
+		PositionSignal positionSignal;
 
 		switch (bandOrientation) {
 		case BELOWLOWER:
@@ -82,9 +82,8 @@ public final class BreakOutStrategy implements Strategy<PriceWithStatistics, Ban
 			positionSignal = PositionSignal.NONE;
 			break;
 		case INVALID:
-			positionSignal = PositionSignal.INVALID;
-			break;
 		default:
+			positionSignal = PositionSignal.INVALID;
 		}
 
 		return positionSignal;

@@ -27,17 +27,10 @@ public final class CSVClosePriceDoubleStreamProvider {
 	 * @throws IOException
 	 */
 	public DoubleStream closePrices(final String candleFilePath) throws IOException {
-		// final DateFormat df = new SimpleDateFormat("dd.MM.yyyy", Locale.ENGLISH);
 		return Files.lines(Paths.get(candleFilePath)).skip(1).mapToDouble(candleData -> {
 			final String[] candleColumns = candleData.split(",", -1);
 
-			// final Date date = df.parse(candleColumns[0]);
-			// final double open = Double.parseDouble(candleColumns[1]);
-			// final double low = Double.parseDouble(candleColumns[2]);
-			// final double high = Double.parseDouble(candleColumns[3]);
-			final double close = Double.parseDouble(candleColumns[4]);
-
-			return close;
+			return Double.parseDouble(candleColumns[4]);
 		});
 	}
 

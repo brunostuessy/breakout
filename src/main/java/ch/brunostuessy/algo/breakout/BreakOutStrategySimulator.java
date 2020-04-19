@@ -22,7 +22,7 @@ import reactor.core.publisher.Flux;
  */
 public final class BreakOutStrategySimulator {
 
-	private static Logger logger = LogManager.getLogger(BreakOutStrategySimulator.class.getName());
+	private static final Logger logger = LogManager.getLogger(BreakOutStrategySimulator.class.getName());
 
 	public static void main(String[] args) {
 		final Simulator simulator = new SimulatorImpl();
@@ -32,7 +32,7 @@ public final class BreakOutStrategySimulator {
 		final double initialCashBalance = 1000000;
 		final String candleFilePath = args != null && args.length == 1 ? args[0] : null;
 		try (final DoubleStream closePrices = new CSVClosePriceDoubleStreamProvider().closePrices(candleFilePath)) {
-			new StrategyRunner<PriceWithStatistics, BandOrientation>(breakOutStrategy, simulator, false)
+			new StrategyRunner<>(breakOutStrategy, simulator, false)
 					.runStrategy(initialCashBalance, Flux.fromStream(closePrices.boxed()));
 		} catch (final Error | IOException | RuntimeException e) {
 			logger.error("exception caught:", e);
