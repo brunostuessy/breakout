@@ -23,14 +23,14 @@ import reactor.core.publisher.Flux;
  */
 public final class StrategyRunner<P, S> {
 
-	private static Logger logger = LogManager.getLogger(StrategyRunner.class.getName());
+	private static final Logger logger = LogManager.getLogger(StrategyRunner.class.getName());
 
 	private final Simulator simulator;
 	private final Strategy<P, S> strategy;
 
 	private final boolean useLookaheadPrice;
 
-	private AtomicReference<Double> lastPrice = new AtomicReference<>();
+	private final AtomicReference<Double> lastPrice = new AtomicReference<>();
 
 	public StrategyRunner(final Strategy<P, S> strategy, final Simulator simulator, final boolean useLookaheadPrice) {
 		Objects.requireNonNull(strategy, "strategy is null!");
@@ -65,23 +65,16 @@ public final class StrategyRunner<P, S> {
 	public Flux<PositionSignal> prepareStrategy(final double initialCashBalance, final Flux<Double> prices) {
 		simulator.setCashBalance(initialCashBalance);
 
-		final Flux<Double> marketPrices = prices.doOnNext(price -> {
-			simulator.setCurrentPrice(price);
-		});
-		final Flux<Double> tradePrices = !useLookaheadPrice ? marketPrices : marketPrices.map(price -> {
-			return lastPrice.getAndSet(price);
-		});
-		return tradePrices.map(price -> {
-			return strategy.mapPriceToPriceStats(price);
-		}).map(priceStats -> {
-			return strategy.mapPriceStatsToSignal(priceStats);
-		}).distinctUntilChanged().map(signal -> {
-			return strategy.mapSignalToPositionSignal(signal);
-		}).doOnNext(positionSignal -> {
-			doApplyPositionSignal(positionSignal);
-		}).doFinally(signalType -> {
-			doCloseAllPositions();
-		});
+		final Flux<Double> marketPrices = prices
+				.doOnNext(price -> simulator.setCurrentPrice(price));
+		final Flux<Double> tradePrices = !useLookaheadPrice ? marketPrices : marketPrices
+				.map(price -> lastPrice.getAndSet(price));
+		return tradePrices
+				.map(price -> strategy.mapPriceToPriceStats(price))
+				.map(priceStats -> strategy.mapPriceStatsToSignal(priceStats))
+				.distinctUntilChanged().map(signal -> strategy.mapSignalToPositionSignal(signal))
+				.doOnNext(positionSignal -> doApplyPositionSignal(positionSignal))
+				.doFinally(signalType -> doCloseAllPositions());
 	}
 
 	private void doApplyPositionSignal(final PositionSignal positionSignal) {
