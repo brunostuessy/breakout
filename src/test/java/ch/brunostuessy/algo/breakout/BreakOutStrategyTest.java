@@ -152,7 +152,7 @@ public class BreakOutStrategyTest {
     	})
 		// ******************************
 
-	    .then(() -> pricer.complete())
+	    .then(pricer::complete)
 	    .verifyComplete();
 
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
@@ -294,7 +294,7 @@ public class BreakOutStrategyTest {
 			assertEquals(Direction.SHORT, runner.getPositionDirection());
     	})
 
-	    .then(() -> pricer.complete())
+	    .then(pricer::complete)
 	    .verifyComplete();
 
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
@@ -446,7 +446,7 @@ public class BreakOutStrategyTest {
     	})
 		// ******************************
 
-	    .then(() -> pricer.complete())
+	    .then(pricer::complete)
 	    .verifyComplete();
 
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
@@ -606,7 +606,7 @@ public class BreakOutStrategyTest {
 			assertEquals(Direction.SHORT, runner.getPositionDirection());
     	})
 
-	    .then(() -> pricer.complete())
+	    .then(pricer::complete)
 	    .verifyComplete();
 
 		assertEquals(Direction.FLAT, runner.getPositionDirection());
@@ -650,7 +650,7 @@ public class BreakOutStrategyTest {
 			assertEquals(BandOrientation.BELOWLOWER, breakOutStrategy.getBandOrientation());
 			assertEquals(Direction.LONG, runner.getPositionDirection());
     	})
-	    .then(() -> pricer.complete())
+	    .then(pricer::complete)
 	    .verifyComplete();
 		
 		assertEquals(Direction.FLAT, runner.getPositionDirection());

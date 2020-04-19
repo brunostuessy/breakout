@@ -66,14 +66,14 @@ public final class StrategyRunner<P, S> {
 		simulator.setCashBalance(initialCashBalance);
 
 		final Flux<Double> marketPrices = prices
-				.doOnNext(price -> simulator.setCurrentPrice(price));
+				.doOnNext(simulator::setCurrentPrice);
 		final Flux<Double> tradePrices = !useLookaheadPrice ? marketPrices : marketPrices
-				.map(price -> lastPrice.getAndSet(price));
+				.map(lastPrice::getAndSet);
 		return tradePrices
-				.map(price -> strategy.mapPriceToPriceStats(price))
-				.map(priceStats -> strategy.mapPriceStatsToSignal(priceStats))
-				.distinctUntilChanged().map(signal -> strategy.mapSignalToPositionSignal(signal))
-				.doOnNext(positionSignal -> doApplyPositionSignal(positionSignal))
+				.map(strategy::mapPriceToPriceStats)
+				.map(strategy::mapPriceStatsToSignal)
+				.distinctUntilChanged().map(strategy::mapSignalToPositionSignal)
+				.doOnNext(this::doApplyPositionSignal)
 				.doFinally(signalType -> doCloseAllPositions());
 	}
 
